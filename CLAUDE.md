@@ -10,10 +10,9 @@ AIを使ったデザイン→実装のデモンストレーション用アプリ
 
 - **フレームワーク**: Next.js v15
 - **言語**: TypeScript
-- **スタイリング**: Tailwind CSS v4
-- **開発ツール**: ESLint, Prettier
-- **デザイン連携**: Figma Dev Mode MCP Server
-- **自動化**: GitHub Actions + Claude Code Actions
+- **スタイリング**: Tailwind CSS v4 + Tailwind Variants
+- **開発ツール**: ESLint
+- **デザイン連携**: Figma Dev Mode MCP Server（設定準備済み）
 
 ## ページ構成
 
@@ -72,28 +71,66 @@ claude mcp list
 
 ## コンポーネントライブラリ
 
-`/lib/components/` 配下に再利用可能なUIコンポーネントを配置:
+`/src/components/` 配下に再利用可能なUIコンポーネントを配置:
 
-- **Button**: 基本ボタンコンポーネント
-- **Input**: フォーム入力要素
-- **Card**: カード形式のレイアウト
-- **Layout**: ページレイアウト
-- **Form**: フォーム関連コンポーネント
+- **Button**: 基本ボタンコンポーネント（primary, secondary, outline, ghost バリアント）
+- **Input**: フォーム入力要素（ラベル・エラー表示機能付き）
+- **Select**: セレクトボックスコンポーネント（オプション配列対応）
+- **Card**: カード形式のレイアウト（Header, Title, Content サブコンポーネント）
 
-すべてのコンポーネントはTailwind CSS v4でスタイリング、TypeScript型定義を含む。
+### Tailwind Variants活用
 
-## GitHub Actions設定
+すべてのコンポーネントでTailwind Variantsを使用し、型安全なバリアント管理を実現:
 
-### Claude Code Actions
+```typescript
+import { tv, type VariantProps } from 'tailwind-variants'
+
+const buttonVariants = tv({
+  base: 'inline-flex items-center justify-center...',
+  variants: {
+    variant: {
+      primary: 'bg-blue-600 text-white...',
+      secondary: 'bg-gray-100 text-gray-900...'
+    },
+    size: {
+      sm: 'h-8 px-3 text-sm',
+      md: 'h-10 px-4 text-base'
+    }
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md'
+  }
+})
+```
+
+### 依存関係
+
+- `tailwind-variants`: コンポーネントバリアント管理
+- `tailwind-merge`: Tailwindクラスの競合解決
+
+## 実装済み機能
+
+### アプリケーション機能
+- ✅ トップページ：電脳義肢サービス紹介（Hero, Features, Products, CTA セクション）
+- ✅ 見積もりフォーム：詳細な申し込みフォーム（バリデーション・概算見積もり機能付き）
+- ✅ 完了ページ：申し込み内容確認とステータス表示
+- ✅ レスポンシブデザイン対応
+
+### 技術的実装
+- ✅ TypeScript型安全性確保
+- ✅ Tailwind Variants によるコンポーネントスタイリング
+- ✅ フォームバリデーション
+- ✅ LocalStorage を使ったデータ永続化
+- ✅ 本番ビルド動作確認済み
+
+## 今後の拡張予定
+
+### GitHub Actions + Claude Code Actions
 - Issue作成時の自動実装ワークフロー
 - Pull Request自動生成
-- コードレビューの自動化
-
-### 非開発者向けIssue作成ガイド
-1. 実装したい機能を具体的に記述
-2. 参考デザイン（Figma URL等）を添付
-3. 優先度とラベルを設定
-4. Claude Code Actionsが自動実装を開始
+- 非開発者向けIssue作成ガイド
+- Figma URL連携による自動コンポーネント生成
 
 ## ディレクトリ構造
 
@@ -102,36 +139,45 @@ claude mcp list
 ├── README.md
 ├── CLAUDE.md
 ├── package.json
-├── next.config.js
-├── tailwind.config.js
+├── next.config.ts
+├── postcss.config.mjs
 ├── tsconfig.json
-├── app/
-│   ├── page.tsx          # トップページ
-│   ├── quote/
-│   │   └── page.tsx      # 申し込みフォーム
-│   ├── complete/
-│   │   └── page.tsx      # 完了ページ
-│   ├── layout.tsx        # ルートレイアウト
-│   └── globals.css       # グローバルスタイル
-├── lib/
-│   └── components/       # コンポーネントライブラリ
+├── src/
+│   ├── app/
+│   │   ├── page.tsx          # トップページ
+│   │   ├── quote/
+│   │   │   └── page.tsx      # 申し込みフォーム
+│   │   ├── complete/
+│   │   │   └── page.tsx      # 完了ページ
+│   │   ├── layout.tsx        # ルートレイアウト
+│   │   ├── globals.css       # グローバルスタイル
+│   │   └── favicon.ico
+│   └── components/           # コンポーネントライブラリ
 │       ├── Button.tsx
 │       ├── Input.tsx
+│       ├── Select.tsx
 │       ├── Card.tsx
-│       ├── Layout.tsx
 │       └── index.ts
-└── .github/
-    └── workflows/        # GitHub Actions
-        └── claude-code-actions.yml
+└── public/                   # 静的ファイル
+    ├── next.svg
+    ├── vercel.svg
+    └── ...
 ```
 
 ## 開発フロー
 
+### 現在の開発フロー
+1. 要件定義・設計
+2. コンポーネントライブラリでUIコンポーネント作成
+3. ページ実装（Tailwind Variants使用）
+4. TypeScript型チェック・ESLint実行
+5. ビルド確認
+
+### Figma連携時の開発フロー（準備済み）
 1. Figmaでデザイン作成
 2. Dev Mode MCPでコンポーネント生成
-3. コンポーネントライブラリに統合
-4. ページ実装
-5. GitHub Actionsでデプロイ
+3. 既存コンポーネントライブラリに統合
+4. ページ実装・調整
 
 ## トラブルシューティング
 
