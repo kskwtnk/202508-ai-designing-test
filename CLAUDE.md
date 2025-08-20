@@ -8,6 +8,29 @@ AI-powered design-to-implementation demonstration application
 - **Response Language**: Japanese (for user communication)
 - **Documentation Language**: English (for broader accessibility and collaboration)
 
+## Figma Design References
+
+### Primary Design Files
+
+The following Figma files serve as the design reference for all UI implementation:
+
+1. **Mockup Data (Main Design Reference)**
+   - URL: https://www.figma.com/design/pjWgkDKN830oRbTGtGmGbx
+   - Purpose: Primary mockup designs for all pages and components
+   - Usage: Default reference for UI implementation unless otherwise specified
+
+2. **Component Library**
+   - URL: https://www.figma.com/design/HDT979jinrL3GvsAfgBd11
+   - Purpose: Reusable component specifications and design system
+   - Usage: Reference for component styling, variants, and behavior
+
+### Implementation Guidelines
+
+- **Default Behavior**: All UI implementations should reference the Mockup Data Figma file
+- **Component Development**: Use the Component Library for creating and styling reusable components
+- **Design Consistency**: Maintain visual consistency with the provided Figma designs
+- **MCP Integration**: Use Figma Dev Mode MCP tools to generate code directly from these design files
+
 ## Project Overview
 
 A bulk quote website for fictional cybernetic prosthetic products. This project demonstrates automatic code generation from Figma designs and enables non-developers to issue implementation instructions through GitHub Issues.
