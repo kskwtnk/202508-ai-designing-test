@@ -1,45 +1,57 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { ButtonHTMLAttributes } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
 
 const buttonVariants = tv({
-  base: 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+  base: "flex gap-1 items-center justify-center p-3 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none",
   variants: {
-    variant: {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500',
-      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500',
-      outline: 'border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-500',
-      ghost: 'text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-500'
+    color: {
+      main: "bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-300",
+      accent:
+        "bg-fuchsia-600 text-white hover:bg-fuchsia-700 shadow-lg shadow-purple-300",
     },
-    size: {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 text-base',
-      lg: 'h-12 px-6 text-lg'
-    }
   },
   defaultVariants: {
-    variant: 'primary',
-    size: 'md'
-  }
-})
+    color: "main",
+  },
+});
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  children: React.ReactNode
+const secondaryLabelVariants = tv({
+  base: "rounded shrink-0 px-1 py-0.5 text-sm font-bold",
+  variants: {
+    color: {
+      main: "bg-sky-100 text-sky-700",
+      accent: "bg-fuchsia-100 text-fuchsia-700",
+    },
+  },
+});
+
+interface ButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color" | "className">,
+    VariantProps<typeof buttonVariants> {
+  primaryLabel: string;
+  secondaryLabel?: string;
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, children, ...props }, ref) => {
-    return (
-      <button
-        className={buttonVariants({ variant, size, className })}
-        ref={ref}
-        {...props}
-      >
-        {children}
-      </button>
-    )
-  }
-)
+function Button({
+  color = "main",
+  primaryLabel,
+  secondaryLabel,
+  ref,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      className={buttonVariants({ color })}
+      ref={ref}
+      {...props}
+    >
+      {secondaryLabel && (
+        <p className={secondaryLabelVariants({ color })}>{secondaryLabel}</p>
+      )}
+      <p className="px-1">{primaryLabel}</p>
+    </button>
+  );
+}
 
-Button.displayName = 'Button'
-
-export default Button
+export default Button;
