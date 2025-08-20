@@ -39,29 +39,35 @@ npm run lint
 npm run type-check
 ```
 
-## Dev Mode MCP設定
+## MCP設定
+
+### 設定済みMCPサーバー
+
+プロジェクトには以下のMCPサーバーが設定済みです：
+
+1. **Figma Dev Mode MCP Server**
+   - URL: `http://127.0.0.1:3845/mcp`
+   - 用途: Figmaからのコード生成・デザインシステム連携
+
+2. **Context7 MCP Server**
+   - URL: `https://mcp.context7.com/mcp`
+   - 用途: ライブラリドキュメント取得・最新情報参照
 
 ### 前提条件
 - Figma Professional/Organization/Enterprise プランのDev/Fullシート
 - Figma デスクトップアプリ
 - Claude Code
 
-### セットアップ手順
+### 利用可能なツール
 
-1. MCPサーバーをClaude Codeに追加:
-```bash
-claude mcp add --transport http figma-dev-mode-mcp-server http://127.0.0.1:3845/mcp
-```
-
-2. サーバー一覧確認:
-```bash
-claude mcp list
-```
-
-3. 利用可能なツール:
+#### Figma Dev Mode Tools:
 - `get_code`: Figma選択範囲からコード生成
 - `get_variable_defs`: デザイン変数の抽出
 - `get_code_connect_map`: Figmaノードとコンポーネントのマッピング
+
+#### Context7 Tools:
+- `resolve-library-id`: ライブラリ名からContext7 IDを解決
+- `get-library-docs`: 最新ライブラリドキュメントを取得
 
 ### ベストプラクティス
 - Figmaファイルを明確なコンポーネント構造で整理
