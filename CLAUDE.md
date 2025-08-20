@@ -1,92 +1,98 @@
-# 電脳義肢一括見積もりサイト
+# Cybernetic Prosthetics Bulk Quote Website
 
-AIを使ったデザイン→実装のデモンストレーション用アプリケーション
+AI-powered design-to-implementation demonstration application
 
-## プロジェクト概要
+## Claude Code Language Settings
 
-架空の電脳義肢製品の一括見積もりサイトです。Figmaデザインから自動的にコードを生成し、開発者以外でもIssueから実装指示が出せるデモンストレーションを行います。
+- **Thinking Language**: English (for internal processing and analysis)
+- **Response Language**: Japanese (for user communication)
+- **Documentation Language**: English (for broader accessibility and collaboration)
 
-## 技術スタック
+## Project Overview
 
-- **フレームワーク**: Next.js v15
-- **言語**: TypeScript
-- **スタイリング**: Tailwind CSS v4 + Tailwind Variants
-- **開発ツール**: ESLint
-- **デザイン連携**: Figma Dev Mode MCP Server（設定準備済み）
+A bulk quote website for fictional cybernetic prosthetic products. This project demonstrates automatic code generation from Figma designs and enables non-developers to issue implementation instructions through GitHub Issues.
 
-## ページ構成
+## Tech Stack
 
-1. **トップページ** (`/`) - サービス紹介、特徴説明、申し込みへの導線
-2. **申し込みフォーム** (`/quote`) - 電脳義肢の見積もり入力フォーム
-3. **完了ページ** (`/complete`) - 申し込み完了メッセージ
+- **Framework**: Next.js v15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4 + Tailwind Variants
+- **Development Tools**: ESLint
+- **Design Integration**: Figma Dev Mode MCP Server (configured and ready)
 
-## 開発環境セットアップ
+## Page Structure
 
-### 1. 依存関係のインストール
+1. **Top Page** (`/`) - Service introduction, feature explanations, and call-to-action for applications
+2. **Quote Form** (`/quote`) - Cybernetic prosthetics quote input form
+3. **Complete Page** (`/complete`) - Application completion message
+
+## Development Environment Setup
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. 開発サーバー起動
+### 2. Start Development Server
 ```bash
 npm run dev
 ```
 
-### 3. ビルド・テスト
+### 3. Build & Test
 ```bash
 npm run build
 npm run lint
 npm run type-check
 ```
 
-## MCP設定
+## MCP Configuration
 
-### 設定済みMCPサーバー
+### Configured MCP Servers
 
-プロジェクトには以下のMCPサーバーが設定済みです：
+The project has the following MCP servers configured:
 
 1. **Figma Dev Mode MCP Server**
    - URL: `http://127.0.0.1:3845/mcp`
-   - 用途: Figmaからのコード生成・デザインシステム連携
+   - Purpose: Code generation from Figma and design system integration
 
 2. **Context7 MCP Server**
    - URL: `https://mcp.context7.com/mcp`
-   - 用途: ライブラリドキュメント取得・最新情報参照
+   - Purpose: Library documentation retrieval and latest information reference
 
-### 前提条件
-- Figma Professional/Organization/Enterprise プランのDev/Fullシート
-- Figma デスクトップアプリ
+### Prerequisites
+- Figma Professional/Organization/Enterprise plan with Dev/Full seats
+- Figma Desktop Application
 - Claude Code
 
-### 利用可能なツール
+### Available Tools
 
 #### Figma Dev Mode Tools:
-- `get_code`: Figma選択範囲からコード生成
-- `get_variable_defs`: デザイン変数の抽出
-- `get_code_connect_map`: Figmaノードとコンポーネントのマッピング
+- `get_code`: Generate code from Figma selection
+- `get_variable_defs`: Extract design variables
+- `get_code_connect_map`: Map Figma nodes to components
 
 #### Context7 Tools:
-- `resolve-library-id`: ライブラリ名からContext7 IDを解決
-- `get-library-docs`: 最新ライブラリドキュメントを取得
+- `resolve-library-id`: Resolve library names to Context7 IDs
+- `get-library-docs`: Retrieve latest library documentation
 
-### ベストプラクティス
-- Figmaファイルを明確なコンポーネント構造で整理
-- セマンティックなレイヤー命名を使用
-- コード生成時は具体的なプロンプトを記述
-- 大きな選択範囲は小さく分割して処理
+### Best Practices
+- Organize Figma files with clear component structure
+- Use semantic layer naming
+- Write specific prompts when generating code
+- Break large selections into smaller parts for processing
 
-## コンポーネントライブラリ
+## Component Library
 
-`/src/components/` 配下に再利用可能なUIコンポーネントを配置:
+Reusable UI components are located in `/src/components/`:
 
-- **Button**: 基本ボタンコンポーネント（primary, secondary, outline, ghost バリアント）
-- **Input**: フォーム入力要素（ラベル・エラー表示機能付き）
-- **Select**: セレクトボックスコンポーネント（オプション配列対応）
-- **Card**: カード形式のレイアウト（Header, Title, Content サブコンポーネント）
+- **Button**: Basic button component (primary, secondary, outline, ghost variants)
+- **Input**: Form input element (with label and error display functionality)
+- **Select**: Select box component (supports option arrays)
+- **Card**: Card-style layout (with Header, Title, Content sub-components)
 
-### Tailwind Variants活用
+### Using Tailwind Variants
 
-すべてのコンポーネントでTailwind Variantsを使用し、型安全なバリアント管理を実現:
+All components use Tailwind Variants for type-safe variant management:
 
 ```typescript
 import { tv, type VariantProps } from 'tailwind-variants'
@@ -110,35 +116,35 @@ const buttonVariants = tv({
 })
 ```
 
-### 依存関係
+### Dependencies
 
-- `tailwind-variants`: コンポーネントバリアント管理
-- `tailwind-merge`: Tailwindクラスの競合解決
+- `tailwind-variants`: Component variant management
+- `tailwind-merge`: Tailwind class conflict resolution
 
-## 実装済み機能
+## Implemented Features
 
-### アプリケーション機能
-- ✅ トップページ：電脳義肢サービス紹介（Hero, Features, Products, CTA セクション）
-- ✅ 見積もりフォーム：詳細な申し込みフォーム（バリデーション・概算見積もり機能付き）
-- ✅ 完了ページ：申し込み内容確認とステータス表示
-- ✅ レスポンシブデザイン対応
+### Application Features
+- ✅ Top Page: Cybernetic prosthetics service introduction (Hero, Features, Products, CTA sections)
+- ✅ Quote Form: Detailed application form (with validation and rough estimate functionality)
+- ✅ Complete Page: Application content confirmation and status display
+- ✅ Responsive design support
 
-### 技術的実装
-- ✅ TypeScript型安全性確保
-- ✅ Tailwind Variants によるコンポーネントスタイリング
-- ✅ フォームバリデーション
-- ✅ LocalStorage を使ったデータ永続化
-- ✅ 本番ビルド動作確認済み
+### Technical Implementation
+- ✅ TypeScript type safety ensured
+- ✅ Component styling with Tailwind Variants
+- ✅ Form validation
+- ✅ Data persistence using LocalStorage
+- ✅ Production build verified
 
-## 今後の拡張予定
+## Future Extensions
 
 ### GitHub Actions + Claude Code Actions
-- Issue作成時の自動実装ワークフロー
-- Pull Request自動生成
-- 非開発者向けIssue作成ガイド
-- Figma URL連携による自動コンポーネント生成
+- Automated implementation workflow on issue creation
+- Automatic Pull Request generation
+- Issue creation guide for non-developers
+- Automatic component generation via Figma URL integration
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 .
@@ -150,48 +156,48 @@ const buttonVariants = tv({
 ├── tsconfig.json
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx          # トップページ
+│   │   ├── page.tsx          # Top page
 │   │   ├── quote/
-│   │   │   └── page.tsx      # 申し込みフォーム
+│   │   │   └── page.tsx      # Quote form
 │   │   ├── complete/
-│   │   │   └── page.tsx      # 完了ページ
-│   │   ├── layout.tsx        # ルートレイアウト
-│   │   ├── globals.css       # グローバルスタイル
+│   │   │   └── page.tsx      # Complete page
+│   │   ├── layout.tsx        # Root layout
+│   │   ├── globals.css       # Global styles
 │   │   └── favicon.ico
-│   └── components/           # コンポーネントライブラリ
+│   └── components/           # Component library
 │       ├── Button.tsx
 │       ├── Input.tsx
 │       ├── Select.tsx
 │       ├── Card.tsx
 │       └── index.ts
-└── public/                   # 静的ファイル
+└── public/                   # Static files
     ├── next.svg
     ├── vercel.svg
     └── ...
 ```
 
-## 開発フロー
+## Development Workflow
 
-### 現在の開発フロー
-1. 要件定義・設計
-2. コンポーネントライブラリでUIコンポーネント作成
-3. ページ実装（Tailwind Variants使用）
-4. TypeScript型チェック・ESLint実行
-5. ビルド確認
+### Current Development Workflow
+1. Requirements definition and design
+2. Create UI components with component library
+3. Page implementation (using Tailwind Variants)
+4. TypeScript type checking and ESLint execution
+5. Build verification
 
-### Figma連携時の開発フロー（準備済み）
-1. Figmaでデザイン作成
-2. Dev Mode MCPでコンポーネント生成
-3. 既存コンポーネントライブラリに統合
-4. ページ実装・調整
+### Figma Integration Workflow (Ready)
+1. Create designs in Figma
+2. Generate components with Dev Mode MCP
+3. Integrate with existing component library
+4. Page implementation and adjustments
 
-## トラブルシューティング
+## Troubleshooting
 
-### MCPサーバー接続エラー
-- Figmaデスクトップアプリが起動していることを確認
-- `http://127.0.0.1:3845/mcp` にアクセス可能か確認
-- Claude Code設定を再確認
+### MCP Server Connection Errors
+- Verify Figma Desktop Application is running
+- Check if `http://127.0.0.1:3845/mcp` is accessible
+- Re-check Claude Code configuration
 
-### ビルドエラー
-- 型エラーは `npm run type-check` で確認
-- Lintエラーは `npm run lint -- --fix` で自動修正
+### Build Errors
+- Check type errors with `npm run type-check`
+- Auto-fix lint errors with `npm run lint -- --fix`
