@@ -1,4 +1,4 @@
-import { Button, Select, TextField } from "@/components";
+import { Button, Select, TextField, StickyCtaProvider, StickyCtaObserver, StickyCtaButton } from "@/components";
 import Image from "next/image";
 
 // Select options data
@@ -17,8 +17,9 @@ const metaHumanOptions = [
 
 export default function Top() {
   return (
-    <div className="flex flex-col">
-      <h1 className="sr-only">Neuroware Guide</h1>
+    <StickyCtaProvider>
+      <div className="flex flex-col">
+        <h1 className="sr-only">Neuroware Guide</h1>
 
       {/* Main Visual Section */}
       <Image
@@ -30,7 +31,7 @@ export default function Top() {
       />
 
       {/* Form Section */}
-      <section className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
+      <section id="first-form-section" className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
         <h2 className="text-center text-xl wrap-anywhere break-keep">
           <p>
             <span className="font-bold text-sky-600">0.02秒</span>
@@ -261,7 +262,7 @@ export default function Top() {
       </section>
 
       {/* Final Form Section */}
-      <section className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
+      <section id="final-form-section" className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
         <h2 className="text-center text-xl wrap-anywhere break-keep">
           <p>
             マルチバース累計
@@ -296,6 +297,19 @@ export default function Top() {
           color="accent"
         />
       </section>
+
+      {/* Sticky CTA Components */}
+      <StickyCtaObserver 
+        triggerElementId="first-form-section" 
+        hideElementId="final-form-section" 
+      />
+      <StickyCtaButton
+        targetElementId="final-form-section"
+        primaryLabel="今すぐ資料請求する"
+        secondaryLabel="無料"
+        color="accent"
+      />
     </div>
+    </StickyCtaProvider>
   );
 }
