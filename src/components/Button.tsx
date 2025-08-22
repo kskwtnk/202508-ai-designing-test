@@ -2,12 +2,12 @@ import { ButtonHTMLAttributes } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
 const buttonVariants = tv({
-  base: "flex gap-1 items-center justify-center p-3 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none",
+  base: "flex items-center justify-center gap-1 rounded-lg p-3 text-lg font-bold shadow-md transition-colors disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
   variants: {
     color: {
-      main: "bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-300",
+      main: "bg-sky-600 text-white shadow-sky-300 hover:bg-sky-700",
       accent:
-        "bg-fuchsia-600 text-white hover:bg-fuchsia-700 shadow-lg shadow-purple-300",
+        "bg-fuchsia-600 text-white shadow-purple-300 hover:bg-fuchsia-700",
     },
   },
   defaultVariants: {
@@ -16,7 +16,7 @@ const buttonVariants = tv({
 });
 
 const secondaryLabelVariants = tv({
-  base: "rounded shrink-0 px-1 py-0.5 text-sm font-bold",
+  base: "shrink-0 rounded px-1 py-0.5 text-sm font-bold",
   variants: {
     color: {
       main: "bg-sky-100 text-sky-700",
@@ -41,11 +41,7 @@ function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      className={buttonVariants({ color })}
-      ref={ref}
-      {...props}
-    >
+    <button className={buttonVariants({ color })} ref={ref} {...props}>
       {secondaryLabel && (
         <p className={secondaryLabelVariants({ color })}>{secondaryLabel}</p>
       )}
