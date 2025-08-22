@@ -1,48 +1,61 @@
-import { SelectHTMLAttributes, forwardRef } from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { SelectHTMLAttributes, useId } from "react";
 
-const selectVariants = tv({
-  base: 'w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 disabled:opacity-50 disabled:bg-gray-50 bg-white',
-  variants: {
-    state: {
-      default: 'border-gray-300 focus:ring-blue-500 focus:border-blue-500',
-      error: 'border-red-500 focus:ring-red-500 focus:border-red-500'
-    }
-  },
-  defaultVariants: {
-    state: 'default'
-  }
-})
+const ChevronDownIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
 
 interface SelectOption {
-  value: string
-  label: string
-  disabled?: boolean
+  value: string;
+  label: string;
+  disabled?: boolean;
 }
 
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement>, VariantProps<typeof selectVariants> {
-  label?: string
-  error?: string
-  options: SelectOption[]
-  placeholder?: string
+interface SelectProps
+  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "className"> {
+  label?: string;
+  placeholder?: string;
+  options: SelectOption[];
+  helpText?: string;
+  errorText?: string;
+  ref?: React.Ref<HTMLSelectElement>;
 }
 
-const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, id, state, options, placeholder, ...props }, ref) => {
-    const selectId = id || `select-${Math.random().toString(36).substring(2, 11)}`
-    const selectState = error ? 'error' : state
+const Select = ({
+  label,
+  placeholder = "プレースホルダー",
+  options,
+  helpText,
+  errorText,
+  ref,
+  ...props
+}: SelectProps) => {
+  const selectId = useId();
 
-    return (
-      <div className="w-full">
-        {label && (
-          <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 mb-1">
-            {label}
-          </label>
-        )}
+  return (
+    <div className="flex flex-col gap-1">
+      {label && (
+        <label htmlFor={selectId} className="text-sm text-slate-900">
+          {label}
+        </label>
+      )}
+      <div className="relative">
         <select
           id={selectId}
-          className={selectVariants({ state: selectState, className })}
           ref={ref}
+          className="w-full appearance-none rounded-md border border-slate-300 bg-white py-2.5 pr-10 pl-3 text-base text-slate-900 disabled:opacity-50"
+          defaultValue={placeholder ? "" : undefined}
           {...props}
         >
           {placeholder && (
@@ -60,14 +73,16 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
-        )}
+        <div className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-600">
+          <ChevronDownIcon />
+        </div>
       </div>
-    )
-  }
-)
+      {helpText && <p className="text-xs text-slate-600">{helpText}</p>}
+      {errorText && <p className="text-xs text-red-600">{errorText}</p>}
+    </div>
+  );
+};
 
-Select.displayName = 'Select'
+Select.displayName = "Select";
 
-export default Select
+export default Select;

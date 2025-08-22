@@ -54,6 +54,31 @@ Output Format: Use tailwind-variants with full TypeScript support"
 - **Font**: Prefer standard classes (font-bold) over complex specifications (font-["Noto_Sans_JP"])
 - **Sizing**: Prioritize standard classes (p-3) over numeric specifications (p-[13px])
 
+## Design Token Alignment
+
+When using Figma Dev Mode MCP for component generation, always apply post-processing to align with design tokens:
+
+### Variable-Based Sizing Correction
+
+Figma auto-layout with stroke inclusion generates pixel values that include border width. Apply the following corrections to match design token variables:
+
+```typescript
+// Auto-generated code (stroke-inclusive) → Corrected code (design token-based)
+px-[13px] → px-3     // size-3 (12px) + border-1 (1px) = 13px → px-3
+py-[11px] → py-2.5   // size-2.5 (10px) + border-1 (1px) = 11px → py-2.5
+px-[15px] → px-4     // size-4 (16px) + border-1 (1px) = 15px → px-4
+py-[13px] → py-3     // size-3 (12px) + border-1 (1px) = 13px → py-3
+```
+
+### Standard Process
+
+1. **Generate code** with `get_code`
+2. **Fetch design tokens** with `get_variable_defs` 
+3. **Apply corrections** to align generated values with design token definitions
+4. **Verify consistency** across components
+
+This ensures consistent spacing that matches the design system while maintaining natural CSS/HTML behavior with stroke inclusion in Figma.
+
 ## Figma Design Optimization
 
 To generate cleaner code, design Figma components with:

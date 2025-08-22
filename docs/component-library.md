@@ -5,9 +5,11 @@
 Reusable UI components are located in `/src/components/`:
 
 - **Button**: Basic button component with color variants and label support
-- **Input**: Form input element (with label and error display functionality)
-- **Select**: Select box component (supports option arrays)
+- **TextField**: Form input element (with label, error display, and unit text functionality)
+- **Select**: Select box component (supports option arrays, help text, and error states)
 - **Card**: Card-style layout (with Header, Title, Content sub-components)
+- **Header**: Application header with logo
+- **Footer**: Application footer component
 
 ## Using Tailwind Variants
 
@@ -46,12 +48,48 @@ Example usage:
 <Button primaryLabel="Apply" secondaryLabel="Free" color="accent" />
 ```
 
+### TextField Component
+
+The TextField component supports:
+- **Input types**: All standard HTML input types
+- **Label and placeholder**: Japanese language support
+- **Unit text**: Display units (e.g., "円", "kg") next to input
+- **Error and help text**: Conditional display of validation messages
+- **React 19 compliance**: Uses direct ref prop and useId hook
+
+Example usage:
+```tsx
+<TextField label="金額" placeholder="金額を入力" unitText="円" />
+<TextField label="お名前" placeholder="お名前を入力" errorText="必須項目です" />
+```
+
+### Select Component
+
+The Select component supports:
+- **Options array**: Array of {value, label, disabled} objects
+- **Placeholder support**: Japanese placeholder text
+- **Help and error text**: Conditional display of guidance messages
+- **React 19 compliance**: Uses direct ref prop and useId hook
+
+Example usage:
+```tsx
+<Select 
+  label="メーカー" 
+  placeholder="選択してください"
+  options={[
+    {value: "a", label: "メーカーA"},
+    {value: "b", label: "メーカーB"}
+  ]}
+/>
+```
+
 ### Implementation Standards
 
 - **React 19**: No forwardRef usage - use direct ref props
+- **useId Hook**: Use React's useId instead of Math.random() for ID generation
 - **TypeScript**: Full type safety with proper prop interfaces
 - **Accessibility**: Semantic HTML and proper ARIA attributes
-- **Performance**: Minimal re-renders with optimized variant calculations
+- **Japanese Support**: Noto Sans JP font with proper Japanese text handling
 
 ## Dependencies
 

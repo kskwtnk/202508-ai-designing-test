@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button, Card } from "@/components";
+import { Button, Card, Select, TextField } from "@/components";
 
 export default function Home() {
   return (
@@ -16,6 +16,16 @@ export default function Home() {
             <Button primaryLabel="無料見積もりを開始" />
           </Link>
         </div>
+        <Select
+          label="メーカー"
+          placeholder="メーカーを選択"
+          options={[
+            { value: "メーカーA", label: "メーカーA" },
+            { value: "メーカーB", label: "メーカーB" },
+            { value: "メーカーC", label: "メーカーC" },
+          ]}
+        />
+        <TextField label="お名前" placeholder="お名前を入力" />
       </section>
 
       {/* Features Section */}
