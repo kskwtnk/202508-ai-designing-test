@@ -1,6 +1,5 @@
 import { LinkButton, Select, TextField } from "@/components";
 import Image from "next/image";
-import { assetPath } from "@/lib/utils";
 
 // Select options data
 const parallelWorldOptions = [
@@ -23,7 +22,7 @@ export default function Top() {
 
       {/* Main Visual Section */}
       <Image
-        src={assetPath("/main-visual.webp")}
+        src="/main-visual.webp"
         alt="起源肉体以上の駆動感。あなたの精神感応を最も高める電脳義体が分かる。"
         className="h-auto w-full"
         width={800}
@@ -78,13 +77,13 @@ export default function Top() {
           </p>
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-5">
-          <Image src={assetPath("/logo-1.webp")} alt="Logo 1" width={101} height={45} />
-          <Image src={assetPath("/logo-2.webp")} alt="Logo 2" width={62} height={72} />
-          <Image src={assetPath("/logo-3.webp")} alt="Logo 3" width={119} height={47} />
-          <Image src={assetPath("/logo-4.webp")} alt="Logo 4" width={42} height={46} />
-          <Image src={assetPath("/logo-5.webp")} alt="Logo 5" width={74} height={35} />
-          <Image src={assetPath("/logo-6.webp")} alt="Logo 6" width={91} height={50} />
-          <Image src={assetPath("/logo-7.webp")} alt="Logo 7" width={40} height={44} />
+          <Image src="/logo-1.webp" alt="Logo 1" width={101} height={45} />
+          <Image src="/logo-2.webp" alt="Logo 2" width={62} height={72} />
+          <Image src="/logo-3.webp" alt="Logo 3" width={119} height={47} />
+          <Image src="/logo-4.webp" alt="Logo 4" width={42} height={46} />
+          <Image src="/logo-5.webp" alt="Logo 5" width={74} height={35} />
+          <Image src="/logo-6.webp" alt="Logo 6" width={91} height={50} />
+          <Image src="/logo-7.webp" alt="Logo 7" width={40} height={44} />
         </div>
         <LinkButton
           primaryLabel="資料請求の情報入力に進む"
@@ -106,7 +105,7 @@ export default function Top() {
           {/* Case 1 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={assetPath("/user-1.webp")}
+              src="/user-1.webp"
               alt=""
               width={192}
               height={192}
@@ -125,7 +124,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={assetPath("/logo-2.webp")}
+              src="/logo-2.webp"
               alt=""
               width={62}
               height={72}
@@ -135,7 +134,7 @@ export default function Top() {
           {/* Case 2 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={assetPath("/user-2.webp")}
+              src="/user-2.webp"
               alt=""
               width={192}
               height={192}
@@ -151,7 +150,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={assetPath("/logo-6.webp")}
+              src="/logo-6.webp"
               alt=""
               width={91}
               height={50}
@@ -161,7 +160,7 @@ export default function Top() {
           {/* Case 3 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={assetPath("/user-3.webp")}
+              src="/user-3.webp"
               alt=""
               width={192}
               height={192}
@@ -177,7 +176,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={assetPath("/logo-7.webp")}
+              src="/logo-7.webp"
               alt=""
               width={40}
               height={44}
@@ -203,7 +202,7 @@ export default function Top() {
           {/* Point 1 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={assetPath("/point-1.webp")}
+              src="/point-1.webp"
               alt=""
               width={100}
               height={100}
@@ -222,7 +221,7 @@ export default function Top() {
           {/* Point 2 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={assetPath("/point-2.webp")}
+              src="/point-2.webp"
               alt=""
               width={100}
               height={100}
@@ -243,7 +242,7 @@ export default function Top() {
           {/* Point 3 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={assetPath("/point-3.webp")}
+              src="/point-3.webp"
               alt=""
               width={100}
               height={100}
