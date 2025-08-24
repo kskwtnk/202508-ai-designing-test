@@ -26,10 +26,10 @@ jobs:
         run: npm ci
 
       - name: Build application
-        run: npm run build
-        env:
-          GITHUB_PAGES: true
-          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          export GITHUB_PAGES=true
+          export PR_NUMBER=${{ github.event.number }}
+          npm run build
 
       - name: Debug - Show build output
         run: |
