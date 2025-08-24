@@ -18,6 +18,10 @@ const metaHumanOptions = [
 export default function Top() {
   return (
     <div className="flex flex-col">
+      <div className="flex justify-center bg-red-100 p-4 font-bold text-red-800">
+        プレビュー環境チェック用の変更
+      </div>
+
       <h1 className="sr-only">Neuroware Guide</h1>
 
       {/* Main Visual Section */}
