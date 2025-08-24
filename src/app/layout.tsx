@@ -25,7 +25,9 @@ export default function RootLayout({
         className={`${notoSansJP.variable} flex min-h-dvh flex-col text-slate-900 antialiased`}
       >
         <Header />
-        <main className="grow">{children}</main>
+        <main className="flex grow flex-col items-center">
+          <div className="max-w-md">{children}</div>
+        </main>
         <Footer />
       </body>
     </html>
