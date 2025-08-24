@@ -37,7 +37,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
           destination_dir: pr-${{ github.event.number }}
-          keep_files: false
+          keep_files: true
 
       - name: Comment PR
         uses: actions/github-script@v7
