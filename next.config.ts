@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
-const isGitHubPages = process.env.GITHUB_PAGES === "true";
+export const isGitHubPages = process.env.GITHUB_PAGES === "true";
+export const BASE_PATH = "/202508-ai-designing-test";
 
 const nextConfig: NextConfig = {
   output: "export",
@@ -8,8 +9,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: isGitHubPages ? "/202508-ai-designing-test" : "",
-  assetPrefix: isGitHubPages ? "/202508-ai-designing-test" : "",
+  basePath: isGitHubPages ? BASE_PATH : "",
+  assetPrefix: isGitHubPages ? BASE_PATH : "",
 };
 
 export default nextConfig;

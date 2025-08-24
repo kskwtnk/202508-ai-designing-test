@@ -1,21 +1,6 @@
 import { LinkButton, Select, TextField } from "@/components";
 import Image from "next/image";
-
-// Static image imports
-import mainVisual from "/public/main-visual.webp";
-import logo1 from "/public/logo-1.webp";
-import logo2 from "/public/logo-2.webp";
-import logo3 from "/public/logo-3.webp";
-import logo4 from "/public/logo-4.webp";
-import logo5 from "/public/logo-5.webp";
-import logo6 from "/public/logo-6.webp";
-import logo7 from "/public/logo-7.webp";
-import user1 from "/public/user-1.webp";
-import user2 from "/public/user-2.webp";
-import user3 from "/public/user-3.webp";
-import point1 from "/public/point-1.webp";
-import point2 from "/public/point-2.webp";
-import point3 from "/public/point-3.webp";
+import { assetPath } from "@/lib/utils";
 
 // Select options data
 const parallelWorldOptions = [
@@ -38,7 +23,7 @@ export default function Top() {
 
       {/* Main Visual Section */}
       <Image
-        src={mainVisual}
+        src={assetPath("/main-visual.webp")}
         alt="起源肉体以上の駆動感。あなたの精神感応を最も高める電脳義体が分かる。"
         className="h-auto w-full"
         width={800}
@@ -93,13 +78,13 @@ export default function Top() {
           </p>
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-5">
-          <Image src={logo1} alt="Logo 1" width={101} height={45} />
-          <Image src={logo2} alt="Logo 2" width={62} height={72} />
-          <Image src={logo3} alt="Logo 3" width={119} height={47} />
-          <Image src={logo4} alt="Logo 4" width={42} height={46} />
-          <Image src={logo5} alt="Logo 5" width={74} height={35} />
-          <Image src={logo6} alt="Logo 6" width={91} height={50} />
-          <Image src={logo7} alt="Logo 7" width={40} height={44} />
+          <Image src={assetPath("/logo-1.webp")} alt="Logo 1" width={101} height={45} />
+          <Image src={assetPath("/logo-2.webp")} alt="Logo 2" width={62} height={72} />
+          <Image src={assetPath("/logo-3.webp")} alt="Logo 3" width={119} height={47} />
+          <Image src={assetPath("/logo-4.webp")} alt="Logo 4" width={42} height={46} />
+          <Image src={assetPath("/logo-5.webp")} alt="Logo 5" width={74} height={35} />
+          <Image src={assetPath("/logo-6.webp")} alt="Logo 6" width={91} height={50} />
+          <Image src={assetPath("/logo-7.webp")} alt="Logo 7" width={40} height={44} />
         </div>
         <LinkButton
           primaryLabel="資料請求の情報入力に進む"
@@ -121,7 +106,7 @@ export default function Top() {
           {/* Case 1 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={user1}
+              src={assetPath("/user-1.webp")}
               alt=""
               width={192}
               height={192}
@@ -140,7 +125,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={logo2}
+              src={assetPath("/logo-2.webp")}
               alt=""
               width={62}
               height={72}
@@ -150,7 +135,7 @@ export default function Top() {
           {/* Case 2 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={user2}
+              src={assetPath("/user-2.webp")}
               alt=""
               width={192}
               height={192}
@@ -166,7 +151,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={logo6}
+              src={assetPath("/logo-6.webp")}
               alt=""
               width={91}
               height={50}
@@ -176,7 +161,7 @@ export default function Top() {
           {/* Case 3 */}
           <div className="relative flex flex-col gap-y-4 rounded-md bg-white px-3 py-4">
             <Image
-              src={user3}
+              src={assetPath("/user-3.webp")}
               alt=""
               width={192}
               height={192}
@@ -192,7 +177,7 @@ export default function Top() {
               </p>
             </div>
             <Image
-              src={logo7}
+              src={assetPath("/logo-7.webp")}
               alt=""
               width={40}
               height={44}
@@ -218,7 +203,7 @@ export default function Top() {
           {/* Point 1 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={point1}
+              src={assetPath("/point-1.webp")}
               alt=""
               width={100}
               height={100}
@@ -237,7 +222,7 @@ export default function Top() {
           {/* Point 2 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={point2}
+              src={assetPath("/point-2.webp")}
               alt=""
               width={100}
               height={100}
@@ -258,7 +243,7 @@ export default function Top() {
           {/* Point 3 */}
           <div className="flex items-center gap-3 rounded border border-slate-300 bg-white">
             <Image
-              src={point3}
+              src={assetPath("/point-3.webp")}
               alt=""
               width={100}
               height={100}
