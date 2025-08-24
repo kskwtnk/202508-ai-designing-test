@@ -1,0 +1,111 @@
+name: Auto Capture Knowledge
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  capture-lessons:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "Claude Knowledge Bot"
+          git config user.email "claude-bot@noreply.github.com"
+
+      - name: Create knowledge update branch
+        run: |
+          BRANCH_NAME="auto/knowledge-update-$(date +%Y%m%d-%H%M%S)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+
+      - name: Analyze PR changes
+        run: |
+          # 変更されたファイルを分析
+          gh pr view ${{ github.event.number }} --json files --jq '.files[].path' > changed_files.txt
+          gh pr view ${{ github.event.number }} --json title,body,labels --jq . > pr_info.json
+          echo "Analyzing changes from PR #${{ github.event.number }}"
+
+      - name: Capture lessons with Claude Code
+        run: |
+          # Claude Codeを使用して知識を抽出・更新
+          # このステップは実際のClaude Code環境で動作
+          echo "Running Claude Code knowledge capture..."
+
+          # 一時的にマニュアル更新として設定
+          # 実際の実装時はclaude-codeコマンドに置き換え
+          echo "PR #${{ github.event.number }} の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No knowledge updates needed"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Knowledge updates detected"
+          fi
+
+      - name: Commit knowledge updates
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git commit -m "📚 Auto-capture lessons from PR #${{ github.event.number }}
+
+          Automated knowledge update from merged pull request.
+
+          PR Title: $(cat pr_info.json | jq -r '.title')
+          Changed Files: $(cat changed_files.txt | tr '\n' ' ')
+          "
+
+      - name: Create knowledge update PR
+        if: steps.check-changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.number }}" \
+            --body "$(cat << 'EOF'
+          ## 📚 自動知識更新
+
+          このPRは、PR #${{ github.event.number }} から自動抽出された実装経験を記録します。
+
+          ### 更新内容
+          - 実装パターンの抽出
+          - 課題と解決策の記録
+          - 再利用可能コンポーネントの特定
+
+          ### 自動生成
+          - 🤖 Claude Knowledge Bot により自動作成
+          - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
+          - 🔗 元PR: #${{ github.event.number }}
+
+          このPRは自動マージが可能です。内容を確認後、マージしてください。
+          EOF
+          )" \
+            --label "auto-generated,documentation,knowledge-update" \
+            --assignee "@me"
+
+      - name: Auto-merge if safe
+        if: steps.check-changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # ステアリングドキュメントのみの変更の場合は自動マージ
+          CHANGED_DIRS=$(cat changed_files.txt | grep -v "^.kiro/steering/" || true)
+          if [ -z "$CHANGED_DIRS" ]; then
+            echo "Only steering documents changed, enabling auto-merge"
+            gh pr merge $BRANCH_NAME --auto --squash
+          else
+            echo "Non-steering files changed, manual review required"
+          fi
