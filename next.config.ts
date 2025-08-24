@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 export const isGitHubPages = process.env.GITHUB_PAGES === "true";
-export const BASE_PATH = "/202508-ai-designing-test";
+export const PR_NUMBER = process.env.PR_NUMBER;
+export const BASE_PATH = PR_NUMBER 
+  ? `/202508-ai-designing-test/pr-${PR_NUMBER}` 
+  : "/202508-ai-designing-test";
 
 const nextConfig: NextConfig = {
   output: "export",

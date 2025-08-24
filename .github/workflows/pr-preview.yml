@@ -18,8 +18,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -28,6 +28,7 @@ jobs:
         run: npm run build:deploy
         env:
           GITHUB_PAGES: true
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Deploy to GitHub Pages (PR Preview)
         uses: peaceiris/actions-gh-pages@v3
@@ -43,23 +44,23 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const previewUrl = `https://${{ github.repository_owner }}.github.io/202508-ai-designing-test/pr-${prNumber}/`;
-            
+
             // Find existing comment
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber
             });
-            
+
             const botComment = comments.data.find(comment => 
               comment.user.login === 'github-actions[bot]' && 
               comment.body.includes('🚀 Preview deployed')
             );
-            
+
             const body = `🚀 Preview deployed to: ${previewUrl}
-            
+
             This preview will be automatically updated when you push changes to this PR.`;
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
