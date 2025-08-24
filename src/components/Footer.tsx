@@ -1,12 +1,12 @@
-import React from 'react';
-import Logo from './Logo';
+import React from "react";
+import Logo from "./Logo";
 
 const footerLinks = [
-  { text: '運営社情報', href: '#' },
-  { text: '利用規約', href: '#' },
-  { text: 'プライバシーポリシー', href: '#' },
-  { text: '次元超越ポリシー', href: '#' },
-  { text: 'お問い合わせ', href: '#' },
+  { text: "運営社情報", href: "#" },
+  { text: "利用規約", href: "#" },
+  { text: "プライバシーポリシー", href: "#" },
+  { text: "次元超越ポリシー", href: "#" },
+  { text: "お問い合わせ", href: "#" },
 ];
 
 function Footer() {

@@ -78,13 +78,48 @@ export default function Top() {
           </p>
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-5">
-          <Image src={getAssetPath("/logo-1.webp")} alt="Logo 1" width={101} height={45} />
-          <Image src={getAssetPath("/logo-2.webp")} alt="Logo 2" width={62} height={72} />
-          <Image src={getAssetPath("/logo-3.webp")} alt="Logo 3" width={119} height={47} />
-          <Image src={getAssetPath("/logo-4.webp")} alt="Logo 4" width={42} height={46} />
-          <Image src={getAssetPath("/logo-5.webp")} alt="Logo 5" width={74} height={35} />
-          <Image src={getAssetPath("/logo-6.webp")} alt="Logo 6" width={91} height={50} />
-          <Image src={getAssetPath("/logo-7.webp")} alt="Logo 7" width={40} height={44} />
+          <Image
+            src={getAssetPath("/logo-1.webp")}
+            alt="Logo 1"
+            width={101}
+            height={45}
+          />
+          <Image
+            src={getAssetPath("/logo-2.webp")}
+            alt="Logo 2"
+            width={62}
+            height={72}
+          />
+          <Image
+            src={getAssetPath("/logo-3.webp")}
+            alt="Logo 3"
+            width={119}
+            height={47}
+          />
+          <Image
+            src={getAssetPath("/logo-4.webp")}
+            alt="Logo 4"
+            width={42}
+            height={46}
+          />
+          <Image
+            src={getAssetPath("/logo-5.webp")}
+            alt="Logo 5"
+            width={74}
+            height={35}
+          />
+          <Image
+            src={getAssetPath("/logo-6.webp")}
+            alt="Logo 6"
+            width={91}
+            height={50}
+          />
+          <Image
+            src={getAssetPath("/logo-7.webp")}
+            alt="Logo 7"
+            width={40}
+            height={44}
+          />
         </div>
         <LinkButton
           primaryLabel="資料請求の情報入力に進む"

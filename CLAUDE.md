@@ -21,12 +21,14 @@ A bulk quote website for fictional cybernetic prosthetic products. This project 
 ## Implemented Features
 
 ### Application Features
+
 - ✅ Top Page: Cybernetic prosthetics service introduction (Hero, Features, Products, CTA sections)
 - ✅ Quote Form: Detailed application form (with validation and rough estimate functionality)
 - ✅ Complete Page: Application content confirmation and status display
 - ✅ Responsive design support
 
 ### Technical Implementation
+
 - ✅ TypeScript type safety ensured
 - ✅ Component styling with Tailwind CSS and design token alignment
 - ✅ Form validation
@@ -39,6 +41,7 @@ A bulk quote website for fictional cybernetic prosthetic products. This project 
 ## Future Extensions
 
 ### GitHub Actions + Claude Code Actions
+
 - Automated implementation workflow on issue creation
 - Automatic Pull Request generation
 - Issue creation guide for non-developers
