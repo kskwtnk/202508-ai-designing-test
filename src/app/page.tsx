@@ -1,4 +1,4 @@
-import { Button, Select, TextField } from "@/components";
+import { LinkButton, Select, TextField } from "@/components";
 import Image from "next/image";
 
 // Select options data
@@ -58,10 +58,11 @@ export default function Top() {
             helpText="カルダシェフスケールが1未満の世界では「区分無し」を選択してください"
           />
         </div>
-        <Button
+        <LinkButton
           primaryLabel="今すぐ資料請求する"
           secondaryLabel="無料"
           color="accent"
+          href="/quote"
         />
       </section>
 
@@ -84,7 +85,11 @@ export default function Top() {
           <Image src="/logo-6.webp" alt="Logo 1" width={91} height={50} />
           <Image src="/logo-7.webp" alt="Logo 1" width={40} height={44} />
         </div>
-        <Button primaryLabel="資料請求の情報入力に進む" color="main" />
+        <LinkButton
+          primaryLabel="資料請求の情報入力に進む"
+          color="main"
+          href="#final-form"
+        />
       </section>
 
       {/* Cases Section */}
@@ -179,7 +184,11 @@ export default function Top() {
             />
           </div>
         </div>
-        <Button primaryLabel="資料請求の情報入力に進む" color="main" />
+        <LinkButton
+          primaryLabel="資料請求の情報入力に進む"
+          color="main"
+          href="#final-form"
+        />
       </section>
 
       {/* Points Section */}
@@ -257,11 +266,18 @@ export default function Top() {
             <p>※2: 光速の99.5%達成による相対時間の提供を指します。</p>
           </div>
         </div>
-        <Button primaryLabel="資料請求の情報入力に進む" color="main" />
+        <LinkButton
+          primaryLabel="資料請求の情報入力に進む"
+          color="main"
+          href="#final-form"
+        />
       </section>
 
       {/* Final Form Section */}
-      <section className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
+      <section
+        id="final-form"
+        className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6"
+      >
         <h2 className="text-center text-xl wrap-anywhere break-keep">
           <p>
             マルチバース累計
@@ -290,10 +306,11 @@ export default function Top() {
             helpText="カルダシェフスケールが1未満の世界では「区分無し」を選択してください"
           />
         </div>
-        <Button
+        <LinkButton
           primaryLabel="今すぐ資料請求する"
           secondaryLabel="無料"
           color="accent"
+          href="/quote"
         />
       </section>
     </div>

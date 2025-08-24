@@ -21,9 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSansJP.variable} text-slate-900 antialiased`}>
+      <body
+        className={`${notoSansJP.variable} flex min-h-dvh flex-col text-slate-900 antialiased`}
+      >
         <Header />
-        {children}
+        <main className="grow">{children}</main>
         <Footer />
       </body>
     </html>
