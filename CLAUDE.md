@@ -48,7 +48,7 @@ A bulk quote website for fictional cybernetic prosthetic products. This project 
 
 For detailed information, please refer to the following documentation files:
 
-- **[Development Setup](./docs/development-setup.md)** - Environment setup, tech stack, and build instructions
-- **[Figma Guidelines](./docs/figma-guidelines.md)** - Figma integration and code generation guidelines
-- **[Component Library](./docs/component-library.md)** - Component specifications and usage patterns
-- **[MCP Configuration](./docs/mcp-configuration.md)** - MCP server setup and tool usage
+- Project Structure [@.kiro/steering/structure.md](.kiro/steering/structure.md)
+- Technical Specifications [@.kiro/steering/tech.md](.kiro/steering/tech.md)
+- Product Specifications [@.kiro/steering/product.md](.kiro/steering/product.md)
+- Communication [@.kiro/steering/communication.md](.kiro/steering/communication.md)
