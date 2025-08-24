@@ -31,6 +31,16 @@ jobs:
           GITHUB_PAGES: true
           PR_NUMBER: ${{ github.event.number }}
 
+      - name: Debug - Show build output
+        run: |
+          echo "Environment variables:"
+          echo "GITHUB_PAGES=$GITHUB_PAGES"
+          echo "PR_NUMBER=$PR_NUMBER"
+          echo "Built files:"
+          ls -la out/
+          echo "Sample HTML content (first 10 lines):"
+          head -10 out/index.html
+
       - name: Deploy to GitHub Pages (PR Preview)
         uses: peaceiris/actions-gh-pages@v3
         with:
