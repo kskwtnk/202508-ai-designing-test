@@ -2,6 +2,7 @@ name: PR Preview Deploy
 
 on:
   pull_request:
+    types: [opened, synchronize]
     branches: [main]
 
 permissions:
