@@ -42,32 +42,90 @@ jobs:
           gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
           echo "Analyzing changes from PR #$PR_NUMBER"
 
-      - name: Capture lessons with Claude Code
-        id: claude-knowledge-capture
-        uses: anthropics/claude-code-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          direct_prompt: |
-            PR #${{ github.event.pull_request.number }} の情報を分析して、プロジェクトの知識ベースを更新してください：
+      - name: Post knowledge extraction request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Claude Code Actionを呼び出すためのコメントを投稿
+          gh pr comment ${{ github.event.pull_request.number }} --body "$(cat << 'EOF'
+          @claude このPRから学習可能な知識を以下の形式で抽出してください：
 
-            ## 分析対象
-            - 変更ファイル: $(cat changed_files.txt)  
-            - PR情報: $(cat pr_info.json | jq -r '.title + " - " + .body')
-
-            ## 実行内容
-            以下のファイルを適切に更新してください：
-
-            1. **.kiro/steering/patterns.md** - 変更内容から実装パターンを抽出して追加
-            2. **.kiro/steering/challenges.md** - 発見された課題と解決策を記録
-            3. **.kiro/steering/lessons.md** - 学んだ教訓を追加
-
-            ## 要求事項
-            - 既存の内容は保持しつつ、新しい情報を適切に組み込む
-            - Markdown形式で見やすく整理
-            - 今後の開発に役立つ実用的な知見として記録
-            - 重複内容は避け、価値のある情報のみ追加
-
-            分析が完了したら、更新したファイルの概要を教えてください。
+          ## 📚 知識抽出タスク
+          
+          以下の3つのセクションに分けて、このPRから学んだことをまとめてください：
+          
+          ### 1. 実装パターン (patterns.md用)
+          - 使用された技術パターン
+          - ベストプラクティス
+          - 再利用可能なコード構造
+          
+          ### 2. 課題と解決策 (challenges.md用)
+          - 直面した問題
+          - 解決方法
+          - 今後の予防策
+          
+          ### 3. 学んだ教訓 (lessons.md用)
+          - 重要な学び
+          - 将来への提言
+          - チームで共有すべき知見
+          
+          各セクションをMarkdown形式で記述してください。
+          EOF
+          )"
+          
+      - name: Wait for Claude response
+        run: |
+          echo "Waiting for Claude Code Action to respond..."
+          sleep 30  # Claude Code Actionの応答を待つ
+          
+      - name: Extract Claude's knowledge from PR comments
+        id: extract-knowledge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 最新のClaude Code Actionコメントを取得
+          gh pr view ${{ github.event.pull_request.number }} --json comments --jq '.comments[-1].body' > claude_response.txt
+          
+          # コメントが存在し、Claude Code Actionからのものか確認
+          if grep -q "実装パターン" claude_response.txt && grep -q "課題と解決策" claude_response.txt; then
+            echo "has_knowledge=true" >> $GITHUB_OUTPUT
+            
+            # 知識を各ファイルに分割して保存
+            # TODO: より洗練されたパーサーに置き換え
+            echo "# Auto-extracted Knowledge from PR #${{ github.event.pull_request.number }}" > knowledge_patterns.md
+            echo "" >> knowledge_patterns.md
+            sed -n '/実装パターン/,/課題と解決策/p' claude_response.txt | head -n -1 >> knowledge_patterns.md
+            
+            echo "# Auto-extracted Challenges from PR #${{ github.event.pull_request.number }}" > knowledge_challenges.md
+            echo "" >> knowledge_challenges.md
+            sed -n '/課題と解決策/,/学んだ教訓/p' claude_response.txt | head -n -1 >> knowledge_challenges.md
+            
+            echo "# Auto-extracted Lessons from PR #${{ github.event.pull_request.number }}" > knowledge_lessons.md
+            echo "" >> knowledge_lessons.md
+            sed -n '/学んだ教訓/,$p' claude_response.txt >> knowledge_lessons.md
+          else
+            echo "has_knowledge=false" >> $GITHUB_OUTPUT
+            echo "No knowledge extracted from Claude Code Action"
+          fi
+          
+      - name: Update knowledge files
+        if: steps.extract-knowledge.outputs.has_knowledge == 'true'
+        run: |
+          # 既存のファイルに知識を追加
+          if [ -f knowledge_patterns.md ]; then
+            echo "" >> .kiro/steering/patterns.md
+            cat knowledge_patterns.md >> .kiro/steering/patterns.md
+          fi
+          
+          if [ -f knowledge_challenges.md ]; then
+            echo "" >> .kiro/steering/challenges.md
+            cat knowledge_challenges.md >> .kiro/steering/challenges.md
+          fi
+          
+          if [ -f knowledge_lessons.md ]; then
+            echo "" >> .kiro/steering/lessons.md
+            cat knowledge_lessons.md >> .kiro/steering/lessons.md
+          fi
 
       - name: Check for changes
         id: check-changes
