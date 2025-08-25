@@ -17,6 +17,9 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: read
+      actions: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,15 +48,31 @@ jobs:
           echo "Analyzing changes from PR #$PR_NUMBER"
 
       - name: Capture lessons with Claude Code
-        run: |
-          # Claude Codeを使用して知識を抽出・更新
-          # このステップは実際のClaude Code環境で動作
-          echo "Running Claude Code knowledge capture..."
+        id: claude-knowledge-capture
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} の情報を分析して、プロジェクトの知識ベースを更新してください：
 
-          # 一時的にマニュアル更新として設定
-          # 実際の実装時はclaude-codeコマンドに置き換え
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          echo "PR #$PR_NUMBER の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
+            ## 分析対象
+            - 変更ファイル: $(cat changed_files.txt)  
+            - PR情報: $(cat pr_info.json | jq -r '.title + " - " + .body')
+
+            ## 実行内容
+            以下のファイルを適切に更新してください：
+
+            1. **.kiro/steering/patterns.md** - 変更内容から実装パターンを抽出して追加
+            2. **.kiro/steering/challenges.md** - 発見された課題と解決策を記録
+            3. **.kiro/steering/lessons.md** - 学んだ教訓を追加
+
+            ## 要求事項
+            - 既存の内容は保持しつつ、新しい情報を適切に組み込む
+            - Markdown形式で見やすく整理
+            - 今後の開発に役立つ実用的な知見として記録
+            - 重複内容は避け、価値のある情報のみ追加
+
+            分析が完了したら、更新したファイルの概要を教えてください。
 
       - name: Check for changes
         id: check-changes
