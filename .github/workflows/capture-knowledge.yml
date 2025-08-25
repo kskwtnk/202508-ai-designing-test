@@ -3,10 +3,16 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR番号（テスト用）'
+        required: true
+        type: number
 
 jobs:
   capture-lessons:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,11 +33,14 @@ jobs:
           git checkout -b $BRANCH_NAME
 
       - name: Analyze PR changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 変更されたファイルを分析
-          gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path' > changed_files.txt
-          gh pr view ${{ github.event.pull_request.number }} --json title,body,labels --jq . > pr_info.json
-          echo "Analyzing changes from PR #${{ github.event.pull_request.number }}"
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          gh pr view $PR_NUMBER --json files --jq '.files[].path' > changed_files.txt
+          gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
+          echo "Analyzing changes from PR #$PR_NUMBER"
 
       - name: Capture lessons with Claude Code
         run: |
@@ -41,7 +50,8 @@ jobs:
 
           # 一時的にマニュアル更新として設定
           # 実際の実装時はclaude-codeコマンドに置き換え
-          echo "PR #${{ github.event.pull_request.number }} の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          echo "PR #$PR_NUMBER の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
 
       - name: Check for changes
         id: check-changes
@@ -58,7 +68,8 @@ jobs:
       - name: Commit knowledge updates
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
-          git commit -m "📚 Auto-capture lessons from PR #${{ github.event.pull_request.number }}
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          git commit -m "📚 Auto-capture lessons from PR #$PR_NUMBER
 
           Automated knowledge update from merged pull request.
 
@@ -74,11 +85,11 @@ jobs:
           git push origin $BRANCH_NAME
 
           gh pr create \
-            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.pull_request.number }}" \
+            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }}" \
             --body "$(cat << 'EOF'
           ## 📚 自動知識更新
 
-          このPRは、PR #${{ github.event.pull_request.number }} から自動抽出された実装経験を記録します。
+          このPRは、PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} から自動抽出された実装経験を記録します。
 
           ### 更新内容
           - 実装パターンの抽出
@@ -88,7 +99,7 @@ jobs:
           ### 自動生成
           - 🤖 Claude Knowledge Bot により自動作成
           - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
-          - 🔗 元PR: #${{ github.event.pull_request.number }}
+          - 🔗 元PR: #${{ github.event.pull_request.number || github.event.inputs.pr_number }}
 
           このPRは自動マージが可能です。内容を確認後、マージしてください。
           EOF
