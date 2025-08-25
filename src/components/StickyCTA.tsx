@@ -1,3 +1,5 @@
+"use client";
+
 import { useScrollVisibility } from "@/hooks/useScrollVisibility";
 import LinkButton from "./LinkButton";
 

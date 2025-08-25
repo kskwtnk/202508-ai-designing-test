@@ -1,3 +1,5 @@
+"use client";
+
 import { LinkButton, Select, TextField, StickyCTA } from "@/components";
 import Image from "next/image";
 import { getAssetPath } from "@/utils/asset-path";
