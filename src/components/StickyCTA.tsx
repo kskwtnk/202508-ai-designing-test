@@ -33,7 +33,7 @@ function StickyCTA({ firstFormRef, finalFormRef }: StickyCTAProps) {
       `}
     >
       {/* 半透明の黒い背景 */}
-      <div className="bg-black bg-opacity-50 backdrop-blur-sm p-4">
+      <div className="bg-black/50 backdrop-blur-sm p-4">
         {/* 中央配置されたコンテナ（通常のコンテンツの幅と同じ最大幅） */}
         <div className="mx-auto max-w-md">
           <LinkButton
