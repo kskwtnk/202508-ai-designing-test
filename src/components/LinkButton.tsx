@@ -26,10 +26,11 @@ const secondaryLabelVariants = tv({
 });
 
 interface LinkButtonProps
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "color" | "className">,
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "color">,
     VariantProps<typeof buttonVariants> {
   primaryLabel: string;
   secondaryLabel?: string;
+  className?: string;
   ref?: React.Ref<HTMLAnchorElement>;
 }
 
@@ -37,11 +38,12 @@ function LinkButton({
   color = "main",
   primaryLabel,
   secondaryLabel,
+  className,
   ref,
   ...props
 }: LinkButtonProps) {
   return (
-    <a className={buttonVariants({ color })} ref={ref} {...props}>
+    <a className={buttonVariants({ color, className })} ref={ref} {...props}>
       {secondaryLabel && (
         <p className={secondaryLabelVariants({ color })}>{secondaryLabel}</p>
       )}
