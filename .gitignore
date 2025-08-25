@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Kiro specs
 /.kiro/specs
+
+# Temporary files
+/temp
