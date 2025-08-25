@@ -3,10 +3,16 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR番号（テスト用）'
+        required: true
+        type: number
 
 jobs:
   capture-lessons:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -37,13 +43,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 変更されたファイルを分析
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           gh pr view $PR_NUMBER --json files --jq '.files[].path' > changed_files.txt
           gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
           echo "Analyzing changes from PR #$PR_NUMBER"
 
-      - name: Capture lessons with Claude Code
-        id: claude-knowledge-capture
+      - name: Capture lessons with Claude Code (Direct Prompt)
+        if: github.event_name != 'workflow_dispatch'
+        id: claude-knowledge-capture-direct
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -57,6 +64,34 @@ jobs:
             3. **knowledge_lessons.md** - 学んだ教訓
             
             各ファイルには、このPRから抽出した具体的な知識を記載してください。
+
+      - name: Capture lessons with Claude Code (Agent Mode)
+        if: github.event_name == 'workflow_dispatch'
+        id: claude-knowledge-capture-agent
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          mode: agent
+          agent_instructions: |
+            プロジェクトの知識管理エージェントとして動作してください。
+
+            ## 任務
+            PR #${{ github.event.inputs.pr_number }} の情報を分析し、知識ファイルを作成してください。
+
+            ## 実行手順
+            1. PR #${{ github.event.inputs.pr_number }} の変更内容を確認・分析
+            2. 以下の3つのファイルを作成：
+               - knowledge_patterns.md: 実装パターン・ベストプラクティス
+               - knowledge_challenges.md: 課題と解決策
+               - knowledge_lessons.md: 学んだ教訓・今後への提言
+
+            ## ファイル内容の要件
+            - 具体的で実用的な知識を記載
+            - Markdown形式で構造化
+            - 今後の開発に役立つ情報を提供
+            - そのPRから学べる技術的な洞察を含める
+
+            作業完了後、どのような知識を抽出したか概要を報告してください。
           
       - name: Commit knowledge updates
         run: |
@@ -105,7 +140,7 @@ jobs:
       - name: Commit knowledge updates
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           git commit -m "📚 Auto-capture lessons from PR #$PR_NUMBER
 
           Automated knowledge update from merged pull request.
@@ -130,7 +165,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           PR_URL="https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME"
           
           gh issue create \
