@@ -17,8 +17,8 @@ const backgroundVariants = tv({
 });
 
 interface StickyCTAProps {
-  firstFormRef: React.RefObject<HTMLElement>;
-  finalFormRef: React.RefObject<HTMLElement>;
+  firstFormRef: React.RefObject<HTMLElement | null>;
+  finalFormRef: React.RefObject<HTMLElement | null>;
 }
 
 function StickyCTA({ firstFormRef, finalFormRef }: StickyCTAProps) {
