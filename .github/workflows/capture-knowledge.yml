@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
+      pull-requests: read
       actions: read
       id-token: write
     steps:
@@ -37,45 +37,31 @@ jobs:
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           git checkout -b $BRANCH_NAME
 
-      - name: Request knowledge extraction via PR comment
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # PR番号を取得
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          
-          # Claude Code Actionに知識抽出を依頼するコメントを投稿
-          gh pr comment $PR_NUMBER --body "$(cat << 'EOF'
-          @claude このPRから学習可能な知識を抽出して、以下のファイルを更新してください：
+      - name: Extract knowledge with Claude Code Action
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            このPR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} から学習可能な知識を抽出して、以下のファイルを更新してください：
 
-          ## 📝 更新するファイル
+            ## 📝 更新するファイル
 
-          ### 1. .kiro/steering/patterns.md
-          このPRで使用された実装パターン、ベストプラクティス、再利用可能なコード構造を既存の内容に追加してください。
+            ### 1. .kiro/steering/patterns.md
+            このPRで使用された実装パターン、ベストプラクティス、再利用可能なコード構造を既存の内容に追加してください。
 
-          ### 2. .kiro/steering/challenges.md
-          このPRで直面した課題、解決方法、今後の予防策を既存の内容に追加してください。
+            ### 2. .kiro/steering/challenges.md
+            このPRで直面した課題、解決方法、今後の予防策を既存の内容に追加してください。
 
-          ### 3. .kiro/steering/lessons.md
-          このPRから学んだ重要な教訓、将来への提言、チームで共有すべき知見を既存の内容に追加してください。
+            ### 3. .kiro/steering/lessons.md
+            このPRから学んだ重要な教訓、将来への提言、チームで共有すべき知見を既存の内容に追加してください。
 
-          ## 📋 要件
-          - 既存の内容は保持し、新しいセクションを追加
-          - PR番号と日付を含むセクション見出し
-          - 具体的で実用的な内容
-          - 今後の開発に役立つ技術的洞察を含める
+            ## 📋 要件
+            - 既存の内容は保持し、新しいセクションを追加
+            - PR番号と日付を含むセクション見出し
+            - 具体的で実用的な内容
+            - 今後の開発に役立つ技術的洞察を含める
 
-          よろしくお願いします！
-          EOF
-          )"
-
-      - name: Wait for Claude Code Action response
-        run: |
-          echo "Waiting for Claude Code Action to update knowledge files..."
-          sleep 45  # Claude Code Actionの応答とファイル更新を待機
-          
-          # Claude Code Actionが既存ファイルを更新したかチェック
-          git add .kiro/steering/*.md
+            よろしくお願いします！
 
       - name: Check for changes
         id: check-changes
