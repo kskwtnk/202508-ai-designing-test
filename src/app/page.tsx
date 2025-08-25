@@ -20,8 +20,8 @@ const metaHumanOptions = [
 ];
 
 export default function Top() {
-  const firstFormRef = useRef<HTMLElement>(null);
-  const finalFormRef = useRef<HTMLElement>(null);
+  const firstFormRef = useRef<HTMLElement | null>(null);
+  const finalFormRef = useRef<HTMLElement | null>(null);
 
   return (
     <div className="flex flex-col">

@@ -4,8 +4,8 @@ import { useScrollVisibility } from "@/hooks/useScrollVisibility";
 import LinkButton from "./LinkButton";
 
 interface StickyCTAProps {
-  firstFormRef: React.RefObject<HTMLElement>;
-  finalFormRef: React.RefObject<HTMLElement>;
+  firstFormRef: React.RefObject<HTMLElement | null>;
+  finalFormRef: React.RefObject<HTMLElement | null>;
 }
 
 /**

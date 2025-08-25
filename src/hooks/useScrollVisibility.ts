@@ -11,8 +11,8 @@ interface UseScrollVisibilityReturn {
  * Intersection Observer APIを使用してパフォーマンスを最適化
  */
 export function useScrollVisibility(
-  firstFormRef: React.RefObject<HTMLElement>,
-  finalFormRef: React.RefObject<HTMLElement>,
+  firstFormRef: React.RefObject<HTMLElement | null>,
+  finalFormRef: React.RefObject<HTMLElement | null>,
 ): UseScrollVisibilityReturn {
   const [isFirstFormOutOfView, setIsFirstFormOutOfView] = useState(false);
   const [isFinalFormVisible, setIsFinalFormVisible] = useState(false);
