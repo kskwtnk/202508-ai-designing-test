@@ -107,7 +107,6 @@ jobs:
           このPRは自動マージが可能です。内容を確認後、マージしてください。
           EOF
           )" \
-            --label "auto-generated,documentation,knowledge-update" \
             --base main
 
       - name: Auto-merge if safe
