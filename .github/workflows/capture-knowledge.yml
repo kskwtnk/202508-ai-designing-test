@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -79,46 +79,56 @@ jobs:
           Changed Files: $(cat changed_files.txt | tr '\n' ' ')
           "
 
-      - name: Create knowledge update PR
+      - name: Push knowledge update branch
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git push origin $BRANCH_NAME
+          echo "BRANCH_PUSHED=true" >> $GITHUB_OUTPUT
+          echo "PR_URL=https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create notification issue
         if: steps.check-changes.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push origin $BRANCH_NAME
-
           PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          gh pr create \
-            --title "🤖 Knowledge Update: Lessons from PR #${PR_NUMBER}" \
+          PR_URL="https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME"
+          
+          gh issue create \
+            --title "📚 [Action Required] Knowledge update from PR #${PR_NUMBER}" \
             --body "$(cat << 'EOF'
-          ## 📚 自動知識更新
+          ## 📚 知識更新ブランチが作成されました
 
-          このPRは、PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} から自動抽出された実装経験を記録します。
+          PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} から自動抽出された実装経験を記録するブランチを作成しました。
 
-          ### 更新内容
+          ### 🔗 Pull Requestを作成してください
+          
+          以下のリンクをクリックしてPull Requestを作成してください：
+          
+          **[→ Pull Requestを作成]($PR_URL)**
+
+          ### 📝 更新内容
           - 実装パターンの抽出
-          - 課題と解決策の記録
+          - 課題と解決策の記録  
           - 再利用可能コンポーネントの特定
 
-          ### 自動生成
-          - 🤖 Claude Knowledge Bot により自動作成
+          ### ℹ️ 情報
+          - 🌿 ブランチ: `$BRANCH_NAME`
+          - 🤖 自動生成: Claude Knowledge Bot
           - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
           - 🔗 元PR: #${{ github.event.pull_request.number || github.event.inputs.pr_number }}
 
-          このPRは自動マージが可能です。内容を確認後、マージしてください。
+          このIssueはPRが作成されたら閉じてください。
           EOF
-          )" \
-            --base main
+          )"
 
-      - name: Auto-merge if safe
+      - name: Summary
         if: steps.check-changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # ステアリングドキュメントのみの変更の場合は自動マージ
-          CHANGED_DIRS=$(cat changed_files.txt | grep -v "^.kiro/steering/" || true)
-          if [ -z "$CHANGED_DIRS" ]; then
-            echo "Only steering documents changed, enabling auto-merge"
-            gh pr merge $BRANCH_NAME --auto --squash
-          else
-            echo "Non-steering files changed, manual review required"
-          fi
+          echo "## 📚 Knowledge Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Branch created: \`$BRANCH_NAME\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📝 An issue has been created with instructions to create a Pull Request." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Issues](https://github.com/${{ github.repository }}/issues)" >> $GITHUB_STEP_SUMMARY
