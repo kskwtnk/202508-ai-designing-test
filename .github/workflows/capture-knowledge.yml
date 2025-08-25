@@ -29,9 +29,9 @@ jobs:
       - name: Analyze PR changes
         run: |
           # 変更されたファイルを分析
-          gh pr view ${{ github.event.number }} --json files --jq '.files[].path' > changed_files.txt
-          gh pr view ${{ github.event.number }} --json title,body,labels --jq . > pr_info.json
-          echo "Analyzing changes from PR #${{ github.event.number }}"
+          gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path' > changed_files.txt
+          gh pr view ${{ github.event.pull_request.number }} --json title,body,labels --jq . > pr_info.json
+          echo "Analyzing changes from PR #${{ github.event.pull_request.number }}"
 
       - name: Capture lessons with Claude Code
         run: |
@@ -41,7 +41,7 @@ jobs:
 
           # 一時的にマニュアル更新として設定
           # 実際の実装時はclaude-codeコマンドに置き換え
-          echo "PR #${{ github.event.number }} の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
+          echo "PR #${{ github.event.pull_request.number }} の知識抽出が必要です" >> .kiro/steering/knowledge-update-queue.txt
 
       - name: Check for changes
         id: check-changes
@@ -58,7 +58,7 @@ jobs:
       - name: Commit knowledge updates
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
-          git commit -m "📚 Auto-capture lessons from PR #${{ github.event.number }}
+          git commit -m "📚 Auto-capture lessons from PR #${{ github.event.pull_request.number }}
 
           Automated knowledge update from merged pull request.
 
@@ -74,11 +74,11 @@ jobs:
           git push origin $BRANCH_NAME
 
           gh pr create \
-            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.number }}" \
+            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.pull_request.number }}" \
             --body "$(cat << 'EOF'
           ## 📚 自動知識更新
 
-          このPRは、PR #${{ github.event.number }} から自動抽出された実装経験を記録します。
+          このPRは、PR #${{ github.event.pull_request.number }} から自動抽出された実装経験を記録します。
 
           ### 更新内容
           - 実装パターンの抽出
@@ -88,7 +88,7 @@ jobs:
           ### 自動生成
           - 🤖 Claude Knowledge Bot により自動作成
           - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
-          - 🔗 元PR: #${{ github.event.number }}
+          - 🔗 元PR: #${{ github.event.pull_request.number }}
 
           このPRは自動マージが可能です。内容を確認後、マージしてください。
           EOF
