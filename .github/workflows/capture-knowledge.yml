@@ -96,16 +96,16 @@ jobs:
           
           gh issue create \
             --title "📚 [Action Required] Knowledge update from PR #${PR_NUMBER}" \
-            --body "$(cat << 'EOF'
+            --body "$(cat << EOF
           ## 📚 知識更新ブランチが作成されました
 
-          PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} から自動抽出された実装経験を記録するブランチを作成しました。
+          PR #${PR_NUMBER} から自動抽出された実装経験を記録するブランチを作成しました。
 
           ### 🔗 Pull Requestを作成してください
           
           以下のリンクをクリックしてPull Requestを作成してください：
           
-          **[→ Pull Requestを作成]($PR_URL)**
+          **[→ Pull Requestを作成](${PR_URL})**
 
           ### 📝 更新内容
           - 実装パターンの抽出
@@ -113,10 +113,10 @@ jobs:
           - 再利用可能コンポーネントの特定
 
           ### ℹ️ 情報
-          - 🌿 ブランチ: `$BRANCH_NAME`
+          - 🌿 ブランチ: \`${BRANCH_NAME}\`
           - 🤖 自動生成: Claude Knowledge Bot
           - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
-          - 🔗 元PR: #${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          - 🔗 元PR: #${PR_NUMBER}
 
           このIssueはPRが作成されたら閉じてください。
           EOF
