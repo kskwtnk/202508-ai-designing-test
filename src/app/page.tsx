@@ -1,5 +1,6 @@
-import { LinkButton, Select, TextField } from "@/components";
+import { LinkButton, Select, StickyCTA, TextField } from "@/components";
 import Image from "next/image";
+import { useRef } from "react";
 import { getAssetPath } from "@/utils/asset-path";
 
 // Select options data
@@ -17,6 +18,9 @@ const metaHumanOptions = [
 ];
 
 export default function Top() {
+  const firstFormRef = useRef<HTMLElement>(null);
+  const finalFormRef = useRef<HTMLElement>(null);
+
   return (
     <div className="flex flex-col">
       <h1 className="sr-only">Neuroware Guide</h1>
@@ -31,7 +35,7 @@ export default function Top() {
       />
 
       {/* Form Section */}
-      <section className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
+      <section id="first-form" ref={firstFormRef} className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6">
         <h2 className="text-center text-xl wrap-anywhere break-keep">
           <p>
             <span className="font-bold text-sky-600">0.02秒</span>
@@ -312,6 +316,7 @@ export default function Top() {
       {/* Final Form Section */}
       <section
         id="final-form"
+        ref={finalFormRef}
         className="flex flex-col gap-5 bg-slate-100 px-4 pt-5 pb-6"
       >
         <h2 className="text-center text-xl wrap-anywhere break-keep">
@@ -349,6 +354,9 @@ export default function Top() {
           href="/quote"
         />
       </section>
+
+      {/* Sticky CTA */}
+      <StickyCTA firstFormRef={firstFormRef} finalFormRef={finalFormRef} />
     </div>
   );
 }
