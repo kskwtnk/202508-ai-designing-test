@@ -48,81 +48,42 @@ jobs:
           gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
           echo "Analyzing changes from PR #$PR_NUMBER"
 
-      - name: Capture lessons with Claude Code (Direct Prompt)
-        if: github.event_name != 'workflow_dispatch'
-        id: claude-knowledge-capture-direct
-        uses: anthropics/claude-code-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          direct_prompt: |
-            PR #${{ github.event.pull_request.number }} から知識を抽出してください。
-            
-            以下の形式でMarkdownファイルを3つ作成してください：
-            
-            1. **knowledge_patterns.md** - 実装パターン
-            2. **knowledge_challenges.md** - 課題と解決策
-            3. **knowledge_lessons.md** - 学んだ教訓
-            
-            各ファイルには、このPRから抽出した具体的な知識を記載してください。
-
-      - name: Capture lessons with Claude Code (Agent Mode)
-        if: github.event_name == 'workflow_dispatch'
-        id: claude-knowledge-capture-agent
-        uses: anthropics/claude-code-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          custom_instructions: |
-            プロジェクトの知識管理エージェントとして動作してください。
-
-            ## 任務
-            PR #${{ github.event.inputs.pr_number }} の情報を分析し、知識ファイルを作成してください。
-
-            ## 実行手順
-            1. PR #${{ github.event.inputs.pr_number }} の変更内容を確認・分析
-            2. 以下の3つのファイルを作成：
-               - knowledge_patterns.md: 実装パターン・ベストプラクティス
-               - knowledge_challenges.md: 課題と解決策
-               - knowledge_lessons.md: 学んだ教訓・今後への提言
-
-            ## ファイル内容の要件
-            - 具体的で実用的な知識を記載
-            - Markdown形式で構造化
-            - 今後の開発に役立つ情報を提供
-            - そのPRから学べる技術的な洞察を含める
-
-            作業完了後、どのような知識を抽出したか概要を報告してください。
-          
-      - name: Commit knowledge updates
+      - name: Request knowledge extraction via PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Claude Code Actionが作成したファイルを確認
-          if [ -f knowledge_patterns.md ] || [ -f knowledge_challenges.md ] || [ -f knowledge_lessons.md ]; then
-            # 既存のファイルに追加
-            if [ -f knowledge_patterns.md ]; then
-              echo "" >> .kiro/steering/patterns.md
-              echo "## PR #${{ github.event.pull_request.number }} - $(date '+%Y-%m-%d')" >> .kiro/steering/patterns.md
-              cat knowledge_patterns.md >> .kiro/steering/patterns.md
-              rm knowledge_patterns.md
-            fi
-            
-            if [ -f knowledge_challenges.md ]; then
-              echo "" >> .kiro/steering/challenges.md
-              echo "## PR #${{ github.event.pull_request.number }} - $(date '+%Y-%m-%d')" >> .kiro/steering/challenges.md
-              cat knowledge_challenges.md >> .kiro/steering/challenges.md
-              rm knowledge_challenges.md
-            fi
-            
-            if [ -f knowledge_lessons.md ]; then
-              echo "" >> .kiro/steering/lessons.md
-              echo "## PR #${{ github.event.pull_request.number }} - $(date '+%Y-%m-%d')" >> .kiro/steering/lessons.md
-              cat knowledge_lessons.md >> .kiro/steering/lessons.md
-              rm knowledge_lessons.md
-            fi
-            
-            # 変更を追跡
-            git add .kiro/steering/*.md
-          else
-            echo "No knowledge files created by Claude Code Action"
-          fi
+          # Claude Code Actionに知識抽出を依頼するコメントを投稿
+          gh pr comment $PR_NUMBER --body "$(cat << 'EOF'
+          @claude このPRから学習可能な知識を抽出して、以下のファイルを更新してください：
+
+          ## 📝 更新するファイル
+
+          ### 1. .kiro/steering/patterns.md
+          このPRで使用された実装パターン、ベストプラクティス、再利用可能なコード構造を既存の内容に追加してください。
+
+          ### 2. .kiro/steering/challenges.md
+          このPRで直面した課題、解決方法、今後の予防策を既存の内容に追加してください。
+
+          ### 3. .kiro/steering/lessons.md
+          このPRから学んだ重要な教訓、将来への提言、チームで共有すべき知見を既存の内容に追加してください。
+
+          ## 📋 要件
+          - 既存の内容は保持し、新しいセクションを追加
+          - PR番号と日付を含むセクション見出し
+          - 具体的で実用的な内容
+          - 今後の開発に役立つ技術的洞察を含める
+
+          よろしくお願いします！
+          EOF
+          )"
+
+      - name: Wait for Claude Code Action response
+        run: |
+          echo "Waiting for Claude Code Action to update knowledge files..."
+          sleep 45  # Claude Code Actionの応答とファイル更新を待機
+          
+          # Claude Code Actionが既存ファイルを更新したかチェック
+          git add .kiro/steering/*.md
 
       - name: Check for changes
         id: check-changes
@@ -159,41 +120,6 @@ jobs:
           echo "BRANCH_PUSHED=true" >> $GITHUB_OUTPUT
           echo "PR_URL=https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-      - name: Create notification issue
-        if: steps.check-changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          PR_URL="https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME"
-          
-          gh issue create \
-            --title "📚 [Action Required] Knowledge update from PR #${PR_NUMBER}" \
-            --body "$(cat << EOF
-          ## 📚 知識更新ブランチが作成されました
-
-          PR #${PR_NUMBER} から自動抽出された実装経験を記録するブランチを作成しました。
-
-          ### 🔗 Pull Requestを作成してください
-          
-          以下のリンクをクリックしてPull Requestを作成してください：
-          
-          **[→ Pull Requestを作成](${PR_URL})**
-
-          ### 📝 更新内容
-          - 実装パターンの抽出
-          - 課題と解決策の記録  
-          - 再利用可能コンポーネントの特定
-
-          ### ℹ️ 情報
-          - 🌿 ブランチ: \`${BRANCH_NAME}\`
-          - 🤖 自動生成: Claude Knowledge Bot
-          - 📅 作成日時: $(date '+%Y-%m-%d %H:%M:%S')
-          - 🔗 元PR: #${PR_NUMBER}
-
-          このIssueはPRが作成されたら閉じてください。
-          EOF
-          )"
 
       - name: Summary
         if: steps.check-changes.outputs.has_changes == 'true'
