@@ -255,6 +255,111 @@ export default function Button({ variant, size, className, ...props }) {
 
 ---
 
+---
+
+## Japanese Typography Optimization Pattern (PR #9 - 2025-08-25)
+
+**Use Case**: Optimize Japanese text display with appropriate line breaks and font weight management
+
+**Implementation**:
+
+```tsx
+// Japanese text with line break control
+<p className="wrap-anywhere break-keep text-right">
+  2025年7月時点で<wbr />1,000万人以上のユーザー
+</p>
+
+// Font weight management (limited to 400/700)
+<p className="font-bold text-sky-600"> // Use font-bold instead of font-medium
+  Japanese text content
+</p>
+
+// Header layout with proper spacing
+<header className="flex items-center justify-between gap-4 bg-white px-4 py-5">
+  <Logo className="h-3.5 w-auto" />
+  <p className="text-xs sm:text-sm">Statistics text</p>
+</header>
+```
+
+**Usage Example**:
+
+```tsx
+// Header.tsx - User statistics display
+<header className="flex items-center justify-between gap-4 bg-white px-4 py-5">
+  <Logo className="h-3.5 w-auto" />
+  <p className="text-xs font-bold text-sky-600 sm:text-sm wrap-anywhere break-keep text-right">
+    2025年7月時点で<wbr />1,000万人以上のユーザー
+  </p>
+</header>
+```
+
+**Considerations**:
+
+- Use `<wbr />` tags at strategic points for natural line breaks in Japanese text
+- `wrap-anywhere break-keep` maintains Japanese-specific line break rules
+- Limit font weights to 400 (normal) and 700 (bold) for performance optimization
+- Use `text-right` for visual balance in header layouts
+- Apply `gap-4` for consistent spacing between header elements
+
+**Related Implementations**: Header user statistics, Japanese content display
+**Variations**:
+
+- `wrap-anywhere break-all` (more aggressive line breaks)
+- `text-xs sm:text-sm md:text-base` (extended responsive scaling)
+
+---
+
+## Header Layout with Statistics Pattern (PR #9 - 2025-08-25)
+
+**Use Case**: Display branding logo alongside statistical information in header
+
+**Implementation**:
+
+```tsx
+// Basic header with logo and statistics
+<header className="flex items-center justify-between gap-4 bg-white px-4 py-5">
+  <Logo className="h-3.5 w-auto" />
+  <div className="text-right">
+    <p className="text-xs sm:text-sm font-bold text-sky-600">
+      Statistical information
+    </p>
+  </div>
+</header>
+```
+
+**Usage Example**:
+
+```tsx
+// Header.tsx implementation
+const Header = () => {
+  return (
+    <header className="flex items-center justify-between gap-4 bg-white px-4 py-5">
+      <Logo className="h-3.5 w-auto" />
+      <p className="text-xs font-bold text-sky-600 sm:text-sm wrap-anywhere break-keep text-right">
+        2025年7月時点で<wbr />1,000万人以上のユーザー
+      </p>
+    </header>
+  );
+};
+```
+
+**Considerations**:
+
+- Use `justify-between` to create space between logo and statistics
+- Apply `gap-4` for consistent spacing between elements
+- Match padding with surrounding layout (`px-4 py-5`)
+- Use `text-right` for statistical information alignment
+- Ensure responsive text sizing with `text-xs sm:text-sm`
+
+**Related Implementations**: Header component, branding layouts
+**Variations**:
+
+- Multiple statistics with vertical stacking
+- Icon + statistics combination
+- Responsive hiding on mobile devices
+
+---
+
 ## Automatic Updates
 
 This file is automatically updated by the `/capture-lessons` command, with new patterns added automatically. Existing patterns are also improved and integrated as appropriate.
