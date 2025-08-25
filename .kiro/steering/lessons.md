@@ -148,6 +148,113 @@ Each implementation experience is recorded with the following structure:
 
 ---
 
+## [2025-08-25] セレクト要素ハイライトアニメーション機能実装 (PR #22)
+
+**Implementation Overview**: 「並行世界区分」セレクト要素に赤く点滅するハイライトアニメーション効果を実装し、ユーザー体験の向上とフォーム要素への視覚的誘導を実現
+
+**Tech Stack**: React 19 + TypeScript + Tailwind CSS + CSS Animations + React State Management
+
+**Key Implementation**:
+
+- CSS `@keyframes` を使用した赤色ボックスシャドウの脈動アニメーション実装
+- React useState によるハイライト状態管理とイベントハンドリング
+- アクセシビリティ配慮として `prefers-reduced-motion` 対応
+- Select.tsx コンポーネントへの `highlight` prop 拡張
+- フォーカス、値変更、ブラーイベントによる適切なアニメーション制御
+
+**Issues Encountered**:
+
+1. **パフォーマンス課題**: box-shadowアニメーションの重い処理負荷でGPU最適化が不十分
+2. **ハードコーディング**: アニメーション設定値（1s, 4px, 20px）とデータ定義の重複
+3. **UX設計**: 初期状態でのアニメーション即時開始による唐突感
+4. **保守性**: Magic Numbersと重複データによるメンテナンス性の低下
+
+**Solutions**:
+
+1. **パフォーマンス最適化戦略**:
+   - `transform` + `opacity` ベースのGPU加速アニメーション推奨
+   - `will-change` プロパティによるブラウザへの最適化ヒント提供
+   - `prefers-reduced-motion` によるアクセシビリティ確保
+
+2. **設計品質向上**:
+   - デザイントークン管理システムによるハードコーディング排除
+   - CSS変数またはTailwind設定での一元的な値管理
+   - 共通データの定数化と再利用パターン確立
+
+3. **UX改善**:
+   - 遅延アニメーション開始（500ms後）によるユーザー認知負荷軽減
+   - ユーザーアクション優先のアニメーション状態管理
+   - 適切なクリーンアップ処理によるメモリリーク防止
+
+**Reusability**: 高 - アニメーション状態管理パターン、パフォーマンス最適化手法、アクセシビリティ対応は他のUI要素にも適用可能
+
+**Difficulty**: 中級 - CSS Animation、React状態管理、パフォーマンス最適化、アクセシビリティを統合した実装
+
+**Tags**: [Animation, Performance Optimization, State Management, Accessibility, Design Tokens, UX Design]
+
+### 重要な学習ポイント
+
+#### 1. CSSアニメーションパフォーマンス最適化
+- **GPU加速プロパティの優先使用**: `transform`, `opacity` はGPU最適化され、`box-shadow`, `filter` より軽量
+- **ブラウザヒント提供**: `will-change` プロパティで最適化意図を明示
+- **レイヤー促進**: `transform: translateZ(0)` でハードウェア加速レイヤーを生成
+
+#### 2. 設計品質とメンテナンス性
+- **デザイントークン戦略**: 実装前段階でのトークン管理システム設計が重要
+- **DRY原則の徹底**: データ定義の重複は保守性を著しく低下させる
+- **Magic Number排除**: 数値定数は意味のある名前での管理が必須
+
+#### 3. ユーザー体験設計
+- **アニメーションタイミング**: ページロード直後ではなく、ユーザーが内容を理解してからの開始が適切
+- **認知負荷配慮**: 唐突なアニメーションはユーザー体験を阻害する可能性
+- **アクセシビリティ**: `prefers-reduced-motion` 対応は必須要件
+
+#### 4. React実装ベストプラクティス
+- **状態管理の適切性**: アニメーション状態は局所的状態で管理し、必要時のみグローバル化
+- **クリーンアップの重要性**: `useEffect`, タイマー使用時のメモリリーク防止
+- **イベントハンドラー最適化**: `useCallback` による不要な再レンダリング防止
+
+### 今後の開発への提言
+
+#### 即時適用すべき改善点
+1. **パフォーマンス最適化の標準化**:
+   ```css
+   /* 推奨パターン */
+   .animation-class {
+     will-change: transform, opacity;
+     transform: translateZ(0);
+   }
+   ```
+
+2. **デザイントークン管理の導入**:
+   ```css
+   :root {
+     --animation-duration-slow: 1s;
+     --color-highlight: rgba(220, 38, 38, 0.8);
+   }
+   ```
+
+3. **コードレビューチェックリスト**:
+   - Magic Number検出
+   - GPU最適化プロパティ使用確認
+   - アクセシビリティ対応確認
+   - クリーンアップ処理実装確認
+
+#### 長期的改善戦略
+1. **ESLintルール強化**: ハードコーディング検出の自動化
+2. **パフォーマンス監視**: アニメーション実装後の定期的性能測定
+3. **デザインシステム整備**: デザイナーとエンジニアの連携強化
+4. **UXテスト**: アニメーションの心理的影響測定
+
+#### チーム知識共有
+- **アニメーション実装ガイドライン**: GPU最適化とアクセシビリティのバランス
+- **レビュー観点**: パフォーマンス、保守性、UXの3軸評価
+- **リファクタリング文化**: 技術的負債の定期的解決
+
+この実装経験から得られた知見は、今後のUI/UX機能実装において、パフォーマンス、保守性、ユーザー体験の3つの軸で品質向上を図る基盤となります。
+
+---
+
 ## Automatic Updates
 
 This file is automatically updated by the `/capture-lessons` command. Manual editing is possible, but please be careful of duplication with auto-generated parts.
