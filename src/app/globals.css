@@ -3,3 +3,28 @@
 body {
   font-family: var(--font-noto-sans-jp), sans-serif;
 }
+
+/* ハイライトアニメーション定義 */
+@keyframes pulse-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(220, 38, 38, 0.8),
+      0 0 20px rgba(220, 38, 38, 0.3);
+  }
+}
+
+.highlight-pulse {
+  animation: pulse-red 1s ease-in-out infinite;
+}
+
+/* アクセシビリティ対応 - アニメーション無効化設定 */
+@media (prefers-reduced-motion: reduce) {
+  .highlight-pulse {
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.6);
+  }
+}

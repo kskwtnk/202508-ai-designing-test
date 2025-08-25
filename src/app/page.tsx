@@ -3,7 +3,7 @@
 import { LinkButton, Select, TextField, StickyCTA } from "@/components";
 import Image from "next/image";
 import { getAssetPath } from "@/utils/asset-path";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 // Select options data
 const parallelWorldOptions = [
@@ -22,6 +22,28 @@ const metaHumanOptions = [
 export default function Top() {
   const firstFormRef = useRef<HTMLElement | null>(null);
   const finalFormRef = useRef<HTMLElement | null>(null);
+  
+  // 最初のセレクト要素のハイライト制御用状態
+  const [firstSelectHighlight, setFirstSelectHighlight] = useState(true);
+  const [firstSelectValue, setFirstSelectValue] = useState("");
+
+  // ハイライト制御用イベントハンドラー
+  const handleFirstSelectFocus = () => {
+    setFirstSelectHighlight(false);
+  };
+
+  const handleFirstSelectChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setFirstSelectValue(event.target.value);
+    setFirstSelectHighlight(false);
+  };
+
+  const handleFirstSelectBlur = () => {
+    if (!firstSelectValue) {
+      setFirstSelectHighlight(true);
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -55,6 +77,10 @@ export default function Top() {
             label="並行世界区分"
             placeholder="選択してください"
             options={parallelWorldOptions}
+            highlight={firstSelectHighlight}
+            onFocus={handleFirstSelectFocus}
+            onChange={handleFirstSelectChange}
+            onBlur={handleFirstSelectBlur}
           />
           <TextField
             label="遺伝子番号"
