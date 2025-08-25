@@ -48,13 +48,14 @@ jobs:
           gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
           echo "Analyzing changes from PR #$PR_NUMBER"
 
-      - name: Capture lessons with Claude Code
-        id: claude-knowledge-capture
+      - name: Capture lessons with Claude Code (Direct Prompt)
+        if: github.event_name != 'workflow_dispatch'
+        id: claude-knowledge-capture-direct
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           direct_prompt: |
-            PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }} の情報を分析して、プロジェクトの知識ベースを更新してください：
+            PR #${{ github.event.pull_request.number }} の情報を分析して、プロジェクトの知識ベースを更新してください：
 
             ## 分析対象
             - 変更ファイル: $(cat changed_files.txt)  
@@ -74,6 +75,35 @@ jobs:
             - 重複内容は避け、価値のある情報のみ追加
 
             分析が完了したら、更新したファイルの概要を教えてください。
+
+      - name: Capture lessons with Claude Code (Agent Mode)
+        if: github.event_name == 'workflow_dispatch'
+        id: claude-knowledge-capture-agent
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          mode: agent
+          agent_instructions: |
+            あなたはプロジェクトの知識管理を担当するエージェントです。
+
+            ## 任務
+            PR #${{ github.event.inputs.pr_number }} の情報を分析して、プロジェクトの知識ベースを更新してください。
+
+            ## 実行手順
+            1. changed_files.txt を読み込んで変更されたファイルを確認
+            2. pr_info.json を読み込んでPR情報を分析  
+            3. 以下のファイルを適切に更新：
+               - .kiro/steering/patterns.md: 実装パターンを抽出して追加
+               - .kiro/steering/challenges.md: 課題と解決策を記録
+               - .kiro/steering/lessons.md: 学んだ教訓を追加
+
+            ## ガイドライン
+            - 既存の内容は保持し、新しい情報を適切に統合
+            - Markdown形式で見やすく整理
+            - 重複を避け、価値のある知見のみ追加
+            - 今後の開発に実用的な情報を記録
+
+            作業完了後、更新した内容の概要を報告してください。
 
       - name: Check for changes
         id: check-changes
