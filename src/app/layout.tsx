@@ -6,7 +6,7 @@ import "./globals.css";
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "700"], // 日本語Webフォントでたくさんのウェイトを使用すると非常に重くなるため、ウェイトは2つだけに制限。
 });
 
 export const metadata: Metadata = {
