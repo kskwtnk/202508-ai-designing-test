@@ -29,6 +29,7 @@ interface SelectProps
   options: SelectOption[];
   helpText?: string;
   errorText?: string;
+  highlight?: boolean;
   ref?: React.Ref<HTMLSelectElement>;
 }
 
@@ -38,6 +39,7 @@ const Select = ({
   options,
   helpText,
   errorText,
+  highlight = false,
   ref,
   ...props
 }: SelectProps) => {
@@ -54,7 +56,9 @@ const Select = ({
         <select
           id={selectId}
           ref={ref}
-          className="w-full appearance-none rounded-md border border-slate-300 bg-white py-2.5 pr-10 pl-3 text-base text-slate-900 disabled:opacity-50"
+          className={`w-full appearance-none rounded-md border border-slate-300 bg-white py-2.5 pr-10 pl-3 text-base text-slate-900 disabled:opacity-50 ${
+            highlight ? "highlight-pulse" : ""
+          }`}
           defaultValue={placeholder ? "" : undefined}
           {...props}
         >
