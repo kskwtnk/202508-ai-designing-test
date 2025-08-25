@@ -38,20 +38,13 @@ jobs:
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           git checkout -b $BRANCH_NAME
 
-      - name: Analyze PR changes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # 変更されたファイルを分析
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          gh pr view $PR_NUMBER --json files --jq '.files[].path' > changed_files.txt
-          gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
-          echo "Analyzing changes from PR #$PR_NUMBER"
-
       - name: Request knowledge extraction via PR comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # PR番号を取得
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          
           # Claude Code Actionに知識抽出を依頼するコメントを投稿
           gh pr comment $PR_NUMBER --body "$(cat << 'EOF'
           @claude このPRから学習可能な知識を抽出して、以下のファイルを更新してください：
