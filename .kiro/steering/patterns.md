@@ -360,6 +360,262 @@ const Header = () => {
 
 ---
 
+## CSS Animation Performance Pattern (PR #22 - 2025-08-25)
+
+**Use Case**: CSSアニメーションを高いパフォーマンスで実装する際のGPU加速を活用したパターン
+
+**Implementation**:
+
+```css
+/* パフォーマンス最適化されたアニメーション */
+@keyframes pulse-red-optimized {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.8), 0 0 20px rgba(220, 38, 38, 0.3);
+  }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+  .highlight-animation {
+    animation: none;
+  }
+}
+
+/* アニメーション適用 */
+.highlight-animation {
+  animation: pulse-red-optimized 1s ease-in-out infinite;
+  /* GPU加速を促進 */
+  will-change: transform, box-shadow;
+  transform: translateZ(0); /* レイヤー促進 */
+}
+```
+
+**Usage Example**:
+
+```tsx
+// Select.tsx でのハイライトアニメーション実装
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  options: Array<{ value: string; label: string }>;
+  helpText?: string;
+  highlight?: boolean; // ハイライト制御用prop
+}
+
+export default function Select({ highlight, className, ...props }: SelectProps) {
+  const baseClasses = "w-full rounded-md border border-gray-300 px-3 py-2";
+  const highlightClasses = highlight ? "highlight-animation" : "";
+  
+  return (
+    <select 
+      className={cn(baseClasses, highlightClasses, className)} 
+      {...props} 
+    />
+  );
+}
+```
+
+**Considerations**:
+
+- `transform` と `opacity` はGPU加速に最適化されている
+- `box-shadow` の変更は重い処理となるため、必要に応じて `transform` での代替を検討
+- `will-change` プロパティでブラウザにアニメーション予告を送信
+- `prefers-reduced-motion` でアクセシビリティに配慮
+- アニメーション終了後は `will-change: auto` で最適化を解除することを推奨
+
+**Related Implementations**: Select要素のハイライト、フォーカス状態の視覚的フィードバック
+**Variations**:
+
+- `transform: scale()` ベースのアニメーション（より軽量）
+- `opacity` + `transform` の組み合わせ（より滑らか）
+- CSS変数を使用した設定可能なアニメーション
+
+---
+
+## Design Token Management Pattern (PR #22 - 2025-08-25)
+
+**Use Case**: ハードコーディングを避け、一貫性のあるデザインシステムを構築するためのトークン管理
+
+**Implementation**:
+
+```css
+/* CSS変数でのデザイントークン定義 */
+:root {
+  /* Animation tokens */
+  --animation-duration-fast: 0.15s;
+  --animation-duration-normal: 0.3s;
+  --animation-duration-slow: 1s;
+  --animation-ease-in-out: ease-in-out;
+  
+  /* Color tokens */
+  --color-highlight: rgba(220, 38, 38, 0.8);
+  --color-highlight-subtle: rgba(220, 38, 38, 0.4);
+  
+  /* Spacing tokens */
+  --shadow-blur-sm: 4px;
+  --shadow-blur-md: 20px;
+  --shadow-spread: 2px;
+}
+
+/* トークンを使用したアニメーション */
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 0 var(--shadow-spread) var(--color-highlight-subtle);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 var(--shadow-blur-sm) var(--color-highlight),
+      0 0 var(--shadow-blur-md) var(--color-highlight-subtle);
+  }
+}
+
+.highlight-animation {
+  animation: pulse-red var(--animation-duration-slow) var(--animation-ease-in-out) infinite;
+}
+```
+
+**Usage Example**:
+
+```tsx
+// Tailwind configでのカスタムトークン定義
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      animation: {
+        'pulse-highlight': 'pulse-red 1s ease-in-out infinite',
+      },
+      keyframes: {
+        'pulse-red': {
+          '0%, 100%': { 
+            boxShadow: '0 0 0 2px rgba(220, 38, 38, 0.4)' 
+          },
+          '50%': { 
+            boxShadow: '0 0 0 4px rgba(220, 38, 38, 0.8), 0 0 20px rgba(220, 38, 38, 0.3)' 
+          },
+        }
+      }
+    }
+  }
+};
+
+// 使用時
+<select className={highlight ? "animate-pulse-highlight" : ""} />
+```
+
+**Considerations**:
+
+- デザイントークンは一箇所で定義し、複数箇所で再利用
+- アニメーション速度、色、スペースは設定可能にする
+- TypeScriptでトークンの型安全性を確保
+- ダークモード対応時はトークンベースでの切り替えが容易
+- 数値は意味のある名前（`fast`, `normal`, `slow`）で管理
+
+**Related Implementations**: アニメーション、カラーパレット、スペーシングシステム
+**Variations**:
+
+- `@custom-media` を使用したブレークポイント管理
+- `@apply` ディレクティブでの共通スタイル定義
+- JSON形式でのトークン管理と自動生成
+
+---
+
+## State-Driven Animation Control Pattern (PR #22 - 2025-08-25)
+
+**Use Case**: Reactの状態管理を活用してアニメーション状態を適切に制御するパターン
+
+**Implementation**:
+
+```tsx
+// カスタムフックでのアニメーション制御
+function useHighlightControl(trigger: boolean = true) {
+  const [isHighlighted, setIsHighlighted] = useState(trigger);
+  
+  const handleFocus = useCallback(() => setIsHighlighted(true), []);
+  const handleBlur = useCallback(() => setIsHighlighted(false), []);
+  const handleChange = useCallback(() => setIsHighlighted(false), []);
+  
+  // クリーンアップ
+  useEffect(() => {
+    return () => setIsHighlighted(false);
+  }, []);
+  
+  return {
+    isHighlighted,
+    setIsHighlighted,
+    handlers: {
+      onFocus: handleFocus,
+      onBlur: handleBlur,
+      onChange: handleChange,
+    }
+  };
+}
+
+// コンポーネントでの使用
+function FormSection({ initialHighlight = false }) {
+  const { isHighlighted, handlers } = useHighlightControl(initialHighlight);
+  
+  return (
+    <Select
+      highlight={isHighlighted}
+      {...handlers}
+      // その他のprops
+    />
+  );
+}
+```
+
+**Usage Example**:
+
+```tsx
+// page.tsx での実装
+export default function QuotePage() {
+  const [firstSelectHighlight, setFirstSelectHighlight] = useState(false);
+  
+  // 初期ハイライト制御
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFirstSelectHighlight(true);
+    }, 500); // 500ms後にハイライト開始
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  const handleFirstSelectFocus = () => setFirstSelectHighlight(true);
+  const handleFirstSelectBlur = () => setFirstSelectHighlight(false);
+  const handleFirstSelectChange = () => setFirstSelectHighlight(false);
+  
+  return (
+    <Select
+      highlight={firstSelectHighlight}
+      onFocus={handleFirstSelectFocus}
+      onBlur={handleFirstSelectBlur}
+      onChange={handleFirstSelectChange}
+    />
+  );
+}
+```
+
+**Considerations**:
+
+- 初期状態は `false` でユーザーアクションに応じてアニメーション開始
+- メモリリーク防止のためコンポーネントアンマウント時のクリーンアップ
+- `useCallback` でイベントハンドラーの再レンダリング最適化
+- タイマー使用時は必ずクリーンアップ処理を実装
+- 複数の要素で同じパターンを使用する場合はカスタムフック化
+
+**Related Implementations**: フォーム要素のハイライト、ユーザー誘導UI、状態フィードバック
+**Variations**:
+
+- デバウンス機能付きハイライト制御
+- アニメーション終了検知での自動状態リセット
+- グローバル状態管理との連携
+
+---
+
 ## Automatic Updates
 
 This file is automatically updated by the `/capture-lessons` command, with new patterns added automatically. Existing patterns are also improved and integrated as appropriate.
