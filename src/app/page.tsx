@@ -1,3 +1,5 @@
+"use client";
+
 import { LinkButton, Select, StickyCTA, TextField } from "@/components";
 import Image from "next/image";
 import { useRef } from "react";
