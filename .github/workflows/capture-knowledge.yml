@@ -3,16 +3,10 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'PR番号（テスト用）'
-        required: true
-        type: number
 
 jobs:
   capture-lessons:
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -43,14 +37,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 変更されたファイルを分析
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
           gh pr view $PR_NUMBER --json files --jq '.files[].path' > changed_files.txt
           gh pr view $PR_NUMBER --json title,body,labels --jq . > pr_info.json
           echo "Analyzing changes from PR #$PR_NUMBER"
 
-      - name: Capture lessons with Claude Code (Direct Prompt)
-        if: github.event_name != 'workflow_dispatch'
-        id: claude-knowledge-capture-direct
+      - name: Capture lessons with Claude Code
+        id: claude-knowledge-capture
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -76,35 +69,6 @@ jobs:
 
             分析が完了したら、更新したファイルの概要を教えてください。
 
-      - name: Capture lessons with Claude Code (Agent Mode)
-        if: github.event_name == 'workflow_dispatch'
-        id: claude-knowledge-capture-agent
-        uses: anthropics/claude-code-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          mode: agent
-          agent_instructions: |
-            あなたはプロジェクトの知識管理を担当するエージェントです。
-
-            ## 任務
-            PR #${{ github.event.inputs.pr_number }} の情報を分析して、プロジェクトの知識ベースを更新してください。
-
-            ## 実行手順
-            1. changed_files.txt を読み込んで変更されたファイルを確認
-            2. pr_info.json を読み込んでPR情報を分析  
-            3. 以下のファイルを適切に更新：
-               - .kiro/steering/patterns.md: 実装パターンを抽出して追加
-               - .kiro/steering/challenges.md: 課題と解決策を記録
-               - .kiro/steering/lessons.md: 学んだ教訓を追加
-
-            ## ガイドライン
-            - 既存の内容は保持し、新しい情報を適切に統合
-            - Markdown形式で見やすく整理
-            - 重複を避け、価値のある知見のみ追加
-            - 今後の開発に実用的な情報を記録
-
-            作業完了後、更新した内容の概要を報告してください。
-
       - name: Check for changes
         id: check-changes
         run: |
@@ -120,7 +84,7 @@ jobs:
       - name: Commit knowledge updates
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
           git commit -m "📚 Auto-capture lessons from PR #$PR_NUMBER
 
           Automated knowledge update from merged pull request.
@@ -141,7 +105,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
           PR_URL="https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME"
           
           gh issue create \
