@@ -13,7 +13,7 @@ const stickyCtaVariants = tv({
 });
 
 const backgroundVariants = tv({
-  base: "w-full bg-black bg-opacity-50 backdrop-blur-sm p-4",
+  base: "w-full bg-black bg-opacity-50 backdrop-blur-sm p-4 flex",
 });
 
 interface StickyCTAProps {
@@ -44,7 +44,6 @@ function StickyCTA({ firstFormRef, finalFormRef }: StickyCTAProps) {
           color="accent"
           href="#final-form"
           onClick={handleClick}
-          className="w-full"
         />
       </div>
     </div>
