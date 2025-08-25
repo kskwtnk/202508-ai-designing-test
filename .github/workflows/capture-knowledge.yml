@@ -18,13 +18,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Setup Git
         run: |
-          git config user.name "Claude Knowledge Bot"
-          git config user.email "claude-bot@noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create knowledge update branch
         run: |
@@ -84,8 +83,9 @@ jobs:
         run: |
           git push origin $BRANCH_NAME
 
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
           gh pr create \
-            --title "🤖 Knowledge Update: Lessons from PR #${{ github.event.pull_request.number || github.event.inputs.pr_number }}" \
+            --title "🤖 Knowledge Update: Lessons from PR #${PR_NUMBER}" \
             --body "$(cat << 'EOF'
           ## 📚 自動知識更新
 
@@ -105,7 +105,7 @@ jobs:
           EOF
           )" \
             --label "auto-generated,documentation,knowledge-update" \
-            --assignee "@me"
+            --base main
 
       - name: Auto-merge if safe
         if: steps.check-changes.outputs.has_changes == 'true'
