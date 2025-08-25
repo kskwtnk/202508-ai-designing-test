@@ -95,7 +95,11 @@ jobs:
 
       - name: Push knowledge update branch
         if: steps.check-changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # GitHub Actionsの認証を使用してpush
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin $BRANCH_NAME
           echo "BRANCH_PUSHED=true" >> $GITHUB_OUTPUT
           echo "PR_URL=https://github.com/${{ github.repository }}/pull/new/$BRANCH_NAME" >> $GITHUB_OUTPUT
